@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title></title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="" />
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <style>
+      #map {
+        height: 800px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      var map = L.map("map").setView([17, 107], 1);
+      var marker = L.marker([17, 107]).addTo(map);
+
+      var circle = L.circle([17, 107.5], {
+        color: "red",
+        fillColor: "#f03",
+        fillOpacity: 0.5,
+        radius: 500,
+      }).addTo(map);
+      var polygon = L.polygon([
+        [17.509, 107.08],
+        [17.503, 107.06],
+        [17.51, 107.047],
+      ]).addTo(map);
+      var popup = L.popup()
+        .setLatLng([18, 107])
+        .setContent("I am a standalone popup.")
+        .openOn(map);
+
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution:
+          '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      }).addTo(map);
+
+      marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+      circle.bindPopup("I am a circle.");
+      polygon.bindPopup("I am a polygon.");
+
+      
+
+      function onMapClick(e) {
+        popup
+          .setLatLng(e.latlng)
+          .setContent("You clicked the map at " + e.latlng.toString())
+          .openOn(map);
+      }
+
+      map.on("click", onMapClick);
+
+      var geojsonFeature = {
+        type: "Feature",
+        properties: {
+          name: "Coors Field",
+          amenity: "Baseball Stadium",
+          popupContent: "This is where the Rockies play!",
+        },
+        geometry: {
+          type: "Point",
+          coordinates: [107.99404, 15.75621],
+        },
+      };
+      L.geoJSON(geojsonFeature).addTo(map);
+
+      var myLines = [
+        {
+          type: "LineString",
+          coordinates: [
+            [100, 10],
+            [105, 15],
+            [110, 15],
+          ],
+        },
+        {
+          type: "LineString",
+          coordinates: [
+            [105, 10],
+            [110, 15],
+            [115, 15],
+          ],
+        },
+      ];
+
+      var myStyle = {
+        color: "#ff7800",
+        weight: 0.5,
+        // opacity: 0.65,
+      };
+
+      L.geoJSON(myLines, {
+        style: myStyle,
+      }).addTo(map);
+    </script>
+    <!-- This map is for aesthetic purposes only, and can not be interacted with! -->
+  </body>
+</html>

@@ -1,0 +1,3 @@
+# Run
+
+`trunk serve`
