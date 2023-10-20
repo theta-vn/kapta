@@ -18,8 +18,9 @@ wasm-logger = "0.2.0"
 
 
 # nalgebra = "0.32"
-# approx = "0.5"
-
 geo = "0.26.0"
 geo-types = "0.7.11"
-proj = "0.27.2"
+approx = "0.5"
+
+
+# proj = { version="0.27.2", features = []} // dependent C++

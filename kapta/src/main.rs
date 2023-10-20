@@ -1,7 +1,6 @@
-// use leptos::ev::Event;
+use geo_types::{Point, Coord};
 use leptos::{html::Div, *};
-// use web_sys::{HtmlElement, HtmlDivElement};
-// use web_sys::HtmlDivElement;
+use kapta::view;
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
@@ -10,25 +9,16 @@ fn main() {
 
 #[component]
 pub fn App() -> impl IntoView {
-    let h = 700;
-    let w = 700;
-    // let lat = 107.;
-    // let long = 17.;
-    let zoom = 3;
-    let count = i32::pow(2, zoom);
-
+    let h: u32 = 700;
+    let w: u32 = 900;    
+    let zoom: u8 = 5;    
+    let center: Coord = (107., 17.).into();
+    let view = view::render(w, h, zoom, center);
     let node_ref = create_node_ref::<Div>();
     let (width, setWidth) = create_signal(0);
     let (height, setHeight) = create_signal(0);
-    let mut array: Vec<String> = [].to_vec();
-    for n in 0..count {
-        for m in 0..count {
-            let url = format!("https://tile.openstreetmap.org/{}/{}/{}.png", zoom, n, m);
-            // log::debug!("URL::{}", url);
-            array.push(url);
-        }
-    }
-    log::debug!("{:#?}", array);
+   
+    let trans = format!("translate3d({}px, {}px, 0px)", view.3, view.4);
     create_effect(move |_| {
         // let node = node_ref.get().unwrap();
         if let Some(node) = node_ref.get() {
@@ -37,30 +27,37 @@ pub fn App() -> impl IntoView {
             log::debug!("{}", height.get());
             log::debug!("{}", width.get());
 
-            log::debug!("Count::{}", count);
+            // log::debug!("Count::{}", count);
         }
     });
 
     view! {
       <div class="mx-auto">
-        <div ref=node_ref class="bg-primary-80 flex"
-
+        <div ref=node_ref class="bg-primary-80 grid grid-cols-5"
           style:height=move || format!("{}px", h)
           style:width=move || format!("{}px", w)
         >
           {
-            array.iter().map(|data| {
+            view.5.iter().map(|data| {
               view!{
                 <img alt="" src={data.clone()}
-                  class=""
-                  style="width: 256px; height: 256px;" // transform: translate3d(402px, 213px, 0px); opacity: 1;" 
+                  class="block"
+                  style="width: 256px; height: 256px;" // transform: translate3d(402px, 213px, 0px); opacity: 1;"
+                  // style:transform={trans.clone()}
                 />
               }
 
             }).collect::<Vec<_>>()
           }
-
-
+          // <img alt="" src=url
+          //   class=""
+          //   style="width: 256px; height: 256px; opacity: 1;"
+          //   style:transform={trans}
+          // />
+          <hr 
+            class="absolute "
+            style:top={"350px"}
+          />
         </div>
       </div>
     }
