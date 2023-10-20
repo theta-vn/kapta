@@ -76,8 +76,8 @@ impl KCoord {
         let cy_tile = coord_3857.coord.y / tile_heigth;
         let x =  cx_tile.ceil() + (length_tile / 2 - 1) as f64;
         let y = - cy_tile.ceil() + (length_tile / 2) as f64;
-        let x_translate = (cx_tile.fract() * TILE as f64) as u32;
-        let y_translate = ((1.0 - cy_tile.fract()) * TILE as f64) as u32;
+        // let x_translate = (cx_tile.fract() * TILE as f64) as u32;
+        // let y_translate = ((1.0 - cy_tile.fract()) * TILE as f64) as u32;
         // (zoom, x as u32, y as u32, x_translate, y_translate)
         Coord { x, y }
     }

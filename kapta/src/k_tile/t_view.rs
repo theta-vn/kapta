@@ -48,8 +48,12 @@ impl TView {
         let mut array: Vec<(u8, usize, usize)> = [].to_vec();
         let mut array_string: Vec<String> = [].to_vec();
         let length_tile = (2 as u64).pow(zoom.into());
+
+        
+        
         for m in 0..length_y as usize {
             for n in 0..length_x as usize {
+                let trans = format!("translate3d({}px, {}px, 0px)", xt, yt);
                 let url = format!(
                     "https://tile.openstreetmap.org/{}/{}/{}.png",
                     zoom,
