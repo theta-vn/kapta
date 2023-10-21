@@ -19,7 +19,7 @@ pub enum CRS {
     #[default]
     EPSG4326, // WGS 84 | World
     EPSG3857, // WGS 84 / Pseudo-Mercato | World between 85.06°S and 85.06°N.
-    // EPSG4756, // VN-2000 | Vietnam-onshore | 1m
+              // EPSG4756, // VN-2000 | Vietnam-onshore | 1m
 }
 impl fmt::Display for CRS {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -40,7 +40,10 @@ pub struct KCoord {
 
 impl From<Coord> for KCoord {
     fn from(coord: Coord) -> Self {
-        Self { coord, kind: CRS::default() }
+        Self {
+            coord,
+            kind: CRS::default(),
+        }
     }
 }
 
@@ -52,14 +55,17 @@ impl KCoord {
         }
     }
 
-	pub fn translate(&self, dx: f64, dy: f64) -> Self {
+    pub fn translate(&self, dx: f64, dy: f64) -> Self {
         Self {
-            coord: Coord { x: self.coord.x + dx, y: self.coord.y + dy },
+            coord: Coord {
+                x: self.coord.x + dx,
+                y: self.coord.y + dy,
+            },
             kind: self.kind,
         }
     }
     pub fn translate3d(&self, zoom: u8) -> (u32, u32) {
-        let (tile_width, tile_heigth) = TView::tile_size(zoom);        
+        let (tile_width, tile_heigth) = TView::tile_size(zoom);
         let cx_tile = self.coord.x / tile_width;
         let cy_tile = self.coord.y / tile_heigth;
         let x_translate = (cx_tile.fract() * TILE as f64) as u32;
@@ -71,17 +77,16 @@ impl KCoord {
         let coord_3857 = self.transformed(CRS::EPSG3857);
         let length_tile = (2 as u64).pow(zoom.into());
         let (tile_width, tile_heigth) = TView::tile_size(zoom);
-        
+
         let cx_tile = coord_3857.coord.x / tile_width;
         let cy_tile = coord_3857.coord.y / tile_heigth;
-        let x =  cx_tile.ceil() + (length_tile / 2 - 1) as f64;
-        let y = - cy_tile.ceil() + (length_tile / 2) as f64;
+        let x = cx_tile.ceil() + (length_tile / 2 - 1) as f64;
+        let y = -cy_tile.ceil() + (length_tile / 2) as f64;
         // let x_translate = (cx_tile.fract() * TILE as f64) as u32;
         // let y_translate = ((1.0 - cy_tile.fract()) * TILE as f64) as u32;
         // (zoom, x as u32, y as u32, x_translate, y_translate)
         Coord { x, y }
     }
-
 
     // pub fn transformed_crs_to_crs(&self, crs: CRS) -> Self {
     //     let coord = self.coord;

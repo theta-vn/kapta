@@ -1,4 +1,4 @@
-use std::ops::Div;
+use std::{ops::Div, usize};
 
 use geo_types::Coord;
 
@@ -15,7 +15,7 @@ pub struct TView {
     pub zoom: u8,
     pub xt: u32,
     pub yt: u32,
-    pub array: Vec<String>,
+    pub array: Vec<(u8, i64, i64, i64)>,
 }
 
 impl TView {
@@ -45,33 +45,53 @@ impl TView {
         let length_x = br_coord.x - tl_coord.x + 1.;
         let length_y = br_coord.y - tl_coord.y + 1.;
         dbg!(length_x, length_y);
-        let mut array: Vec<(u8, usize, usize)> = [].to_vec();
-        let mut array_string: Vec<String> = [].to_vec();
+        let mut array: Vec<(u8, i64, i64, i64)> = [].to_vec();
+        // let mut array_string: Vec<String> = [].to_vec();
         let length_tile = (2 as u64).pow(zoom.into());
 
-        
-        
-        for m in 0..length_y as usize {
-            for n in 0..length_x as usize {
-                let trans = format!("translate3d({}px, {}px, 0px)", xt, yt);
-                let url = format!(
-                    "https://tile.openstreetmap.org/{}/{}/{}.png",
+        for m in 0..length_y as i64 {
+            for n in 0..length_x as i64 {
+                // let trans = format!("translate3d({}px, {}px, 0px)", xt, yt);
+                // let url = format!(
+                //     "https://tile.openstreetmap.org/{}/{}/{}.png",
+                //     zoom,
+                //     ((tl_coord.x as usize + n) as u64) % length_tile,
+                //     ((tl_coord.y as usize + m) as u64) % length_tile
+                // );
+                // array_string.push(url);
+                let x = tl_coord.x as i64 + n;
+                let y = tl_coord.y as i64 + m;
+                array.push((
                     zoom,
-                    ((tl_coord.x as usize + n) as u64) % length_tile,
-                    ((tl_coord.y as usize + m) as u64) % length_tile
-                );
-                array_string.push(url);
-                array.push((zoom, tl_coord.x as usize + n, tl_coord.y as usize + m));
+                    x,
+                    y,
+                    (x - center.x as i64).pow(2) + (y - center.y as i64).pow(2),
+                ));
             }
         }
-        dbg!(array);
+        // dbg!(&array);
+        array.sort_by(|a, b| a.3.partial_cmp(&b.3).unwrap());
+        // order(center.x as usize, center.y as usize, &array);
+        dbg!(&array);
         Self {
             cx: center.x as u32,
             cy: center.y as u32,
             zoom,
             xt,
             yt,
-            array: array_string,
+            array: array,
         }
     }
 }
+
+// pub fn order(x: usize, y: usize, slice: &[(u8, usize,  usize)]) {
+//     dbg!(x, y);
+//     dbg!(slice);
+//     let mut dist: Vec<(usize, i64)> = slice.iter().enumerate().map(|(post, v)| {
+//         (post, ((v.1 as i64 - x as i64).pow(2) + (v.2 as i64 - y as i64).pow(2)))
+//     }).collect::<Vec<_>>();
+//     dist.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+//     dbg!(dist);
+//     // slice.sort_by(|a, b| a.partial_cmp(b).unwrap());
+//     // dbg!(slice);
+// }

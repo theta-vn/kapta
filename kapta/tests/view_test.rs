@@ -1,10 +1,9 @@
-use geo_types::{Point, Coord};
+use geo_types::{Coord, Point};
 use kapta::view;
 #[test]
 fn render() {
-    
     let h: u32 = 700;
-    let w: u32 = 900;    
+    let w: u32 = 900;
     let zoom: u8 = 3;
     // let count = i32::pow(2, zoom);
     let center: Coord = (107., 17.).into();
