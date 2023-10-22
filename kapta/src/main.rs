@@ -11,8 +11,9 @@ fn main() {
 pub fn App() -> impl IntoView {
     let h: u32 = 700;
     let w: u32 = 900;
-    let zoom: u8 = 3;
-    let center: Coord = (107., 17.).into();
+    let zoom: u8 = 0;
+    
+    let center: Coord = (106.645, 10.788).into();
     let view = view::render(w, h, zoom, center);
     let node_ref = create_node_ref::<Div>();
     let (width, setWidth) = create_signal(0);
@@ -46,14 +47,15 @@ pub fn App() -> impl IntoView {
                     .array
                     .iter()
                     .map(|data| {
-                        let trans_x = (w/2 - 128) as f64 + (data.1 - view.center.x ) * 255.;
-                        let trans_y = (h/2 - 128) as f64 + (data.2 - view.center.y) * 255.;
+                        let trans_x = (w/2 - 128) as f64 + (data.1 as f64 +0.5 - view.center.x ) * 255.;
+                        let trans_y = (h/2 - 128) as f64 + (data.2 as f64 +0.5 - view.center.y) * 255.;
                         let trans = format!("translate3d({}px, {}px, 0px)", trans_x , trans_y) ;
+                        let count = (2 as i64).pow(zoom.into());
                         let url = format!(
                             "https://tile.openstreetmap.org/{}/{}/{}.png",
                             data.0,
-                            (data.1 as i64 % (2 as i64).pow(zoom.into())),
-                            (data.2 as i64 % (2 as i64).pow(zoom.into()))
+                            (data.1 as i64).rem_euclid(count),
+                            (data.2 as i64 % count)
                         );
                         view! {
                             <img
