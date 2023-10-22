@@ -1,2 +1,2 @@
 mod k_coord;
-pub use k_coord::{KCoord, CRS, translate};
+pub use k_coord::{translate, KCoord, CRS};

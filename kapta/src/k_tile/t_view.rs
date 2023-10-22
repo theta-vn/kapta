@@ -1,11 +1,8 @@
-use std::{ops::Div, usize};
+use std::ops::Div;
 
 use geo_types::Coord;
 
-use crate::{
-    consts::*,
-    k_geo::KCoord,
-};
+use crate::{consts::*, k_geo::KCoord};
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct TView {
@@ -24,18 +21,16 @@ impl TView {
     pub fn load(center: KCoord, zoom: u8, width: u32, heigth: u32) -> Self {
         let center_proj = center.to_tile_coord(zoom);
 
-        // let length_tile = (2 as u64).pow(zoom.into()) as f64;
+        let dx = (width / 2 - 1) as f64 / TILE as f64;
+        let dy = (heigth / 2 - 1) as f64 / TILE as f64;
 
-        let dx = ((width / 2 - 1) as f64 / TILE as f64).ceil();
-        let dy = ((heigth / 2 - 1) as f64 / TILE as f64).ceil();
-        dbg!(center_proj, dx, dy);
         let tl_proj = Coord {
-            x: center_proj.x.floor() - dx,
-            y: center_proj.y.floor() - dy,
+            x: (center_proj.x - dx).floor(),
+            y: center_proj.y - dy,
         }; //translate(center_proj, -dx, -dy);
         let br_proj = Coord {
-            x: center_proj.x.floor() + dx,
-            y: center_proj.y.floor() + dy,
+            x: center_proj.x + dx,
+            y: center_proj.y + dy,
         }; //translate(center_proj, dx, dy);
         dbg!(center_proj, tl_proj, br_proj);
         // let tl_coord = tl_kc_3876.to_tile_coord(zoom);

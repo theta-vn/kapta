@@ -1,6 +1,6 @@
 use geo_types::Coord;
 // use proj::Transform;
-use std::{fmt, ops::Div};
+use std::fmt;
 
 use crate::{consts::TILE, k_tile::TView};
 pub const BOUND_LON_3857: f64 = 20_048_966.1;
@@ -27,7 +27,7 @@ impl fmt::Display for CRS {
             CRS::EPSG4326 => write!(f, "EPSG:4326"),
             CRS::EPSG3857 => write!(f, "EPSG:3857"),
             // CRS::EPSG4756 => write!(f, "EPSG:4756"),
-            _ => write!(f, "unknown"),
+            // _ => write!(f, "unknown"),
         }
     }
 }
