@@ -2,7 +2,11 @@
 
 // use geo_types::coord;
 use approx::{self, assert_relative_eq};
-use kapta::k_geo::{KCoord, CRS};
+use geo_types::coord;
+use kapta::{
+    consts::{BOUND_LAT_3857, BOUND_LON_3857},
+    k_geo::{KCoord, CRS},
+};
 // use proj::Proj;
 
 #[test]
@@ -19,23 +23,18 @@ fn new() {
     assert_relative_eq!(coord, coord_4326);
 }
 
-// #[test]
-// fn convert() {
-//     use geo_types::{point, Point};
-//     use proj::Transform;
+#[test]
+fn proj() {
+    let coord = KCoord::new(0_f64, 0_f64);
+    let proj = coord.to_proj_coord();
+    let c = coord! { x: BOUND_LON_3857, y: BOUND_LAT_3857 };
+    dbg!(proj);
+    assert_relative_eq!(proj, c);
 
-//     let point = point!(x: -107f64, y: -17f64);
-//     let c = coord! { x: 10., y: 20. };
-//     let a = c
-//         .transformed_crs_to_crs("EPSG:4326", "EPSG:3857")
-//         .unwrap();
+    let coord = KCoord::new(107_f64, 17_f64);
+    let proj = coord.to_proj_coord();
+    dbg!(proj);
 
-//     dbg!(&a);
-
-//     let b = a
-//         .transformed_crs_to_crs( "EPSG:3857", "EPSG:4326")
-//         .unwrap();
-//     dbg!(&b);
-//     // point!(x: -4064052.0f32, y: -7223650.5f32)
-
-// }
+    let re = coord.to_tile_coord(2);
+    dbg!(re);
+}

@@ -41,21 +41,19 @@ pub fn App() -> impl IntoView {
             <div ref=node_ref class="top-0 left-0"
               style="transform: translate3d(0px, 0px, 0px); opacity: 1;"
             >
-                // style:height=move || format!("{}px", h)
-                // style:width=move || format!("{}px", w)
 
                 {view
                     .array
                     .iter()
                     .map(|data| {
-                        let trans_x = (w/2) as i64 - view.xt as i64 + (data.1 - view.cx as i64) * 255;
-                        let trans_y = (h/2) as i64 - view.yt as i64 + (data.2 - view.cy as i64) * 255;
+                        let trans_x = (w/2 - 128) as f64 + (data.1 - view.center.x ) * 255.;
+                        let trans_y = (h/2 - 128) as f64 + (data.2 - view.center.y) * 255.;
                         let trans = format!("translate3d({}px, {}px, 0px)", trans_x , trans_y) ;
                         let url = format!(
                             "https://tile.openstreetmap.org/{}/{}/{}.png",
                             data.0,
-                            (data.1 % (2 as i64).pow(zoom.into())),
-                            (data.2 % (2 as i64).pow(zoom.into()))
+                            (data.1 as i64 % (2 as i64).pow(zoom.into())),
+                            (data.2 as i64 % (2 as i64).pow(zoom.into()))
                         );
                         view! {
                             <img
@@ -75,7 +73,7 @@ pub fn App() -> impl IntoView {
                 // style="width: 256px; height: 256px; opacity: 1;"
                 // style:transform={trans}
                 // />
-                <div class="absolute" style:top="350px" style:left="450px" style:width="2px" style:height="2px" 
+                <div class="absolute" style:top="350px" style:left="450px" style:width="2px" style:height="2px"
                 style:background="red"
                 ></div>
             </div>

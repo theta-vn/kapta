@@ -55,17 +55,9 @@ impl KCoord {
         }
     }
 
-    pub fn translate(&self, dx: f64, dy: f64) -> Self {
-        Self {
-            coord: Coord {
-                x: self.coord.x + dx,
-                y: self.coord.y + dy,
-            },
-            kind: self.kind,
-        }
-    }
     pub fn translate3d(&self, zoom: u8) -> (u32, u32) {
-        let (tile_width, tile_heigth) = TView::tile_size(zoom);
+        let length_tile = (2 as u64).pow(zoom.into());
+        let (tile_width, tile_heigth) = TView::tile_size(length_tile);
         let cx_tile = self.coord.x / tile_width;
         let cy_tile = self.coord.y / tile_heigth;
         let x_translate = (cx_tile.fract() * TILE as f64) as u32;
@@ -73,19 +65,25 @@ impl KCoord {
         (x_translate, y_translate)
     }
 
-    pub fn to_tile_coord(&self, zoom: u8) -> Coord {
-        let coord_3857 = self.transformed(CRS::EPSG3857);
-        let length_tile = (2 as u64).pow(zoom.into());
-        let (tile_width, tile_heigth) = TView::tile_size(zoom);
-
-        let cx_tile = coord_3857.coord.x / tile_width;
-        let cy_tile = coord_3857.coord.y / tile_heigth;
-        let x = cx_tile.ceil() + (length_tile / 2 - 1) as f64;
-        let y = -cy_tile.ceil() + (length_tile / 2) as f64;
-        // let x_translate = (cx_tile.fract() * TILE as f64) as u32;
-        // let y_translate = ((1.0 - cy_tile.fract()) * TILE as f64) as u32;
-        // (zoom, x as u32, y as u32, x_translate, y_translate)
+    pub fn to_proj_coord(&self) -> Coord {
+        let c = self.transformed(CRS::EPSG3857);
+        let x = c.coord.x + BOUND_LON_3857;
+        let y = BOUND_LAT_3857 - c.coord.y;
         Coord { x, y }
+    }
+
+    pub fn to_tile_coord(&self, zoom: u8) -> Coord {
+        let coord_proj = self.to_proj_coord();
+        let length_tile = (2 as u64).pow(zoom.into());
+        let (tile_width, tile_heigth) = TView::tile_size(length_tile);
+
+        let cx_tile = coord_proj.x / tile_width;
+        let cy_tile = coord_proj.y / tile_heigth;
+
+        Coord {
+            x: cx_tile,
+            y: cy_tile,
+        }
     }
 
     // pub fn transformed_crs_to_crs(&self, crs: CRS) -> Self {
@@ -126,11 +124,11 @@ impl KCoord {
                     kind: crs,
                 }
             }
-            (CRS::EPSG3857, CRS::EPSG3857) => *self,
-            // (CRS::EPSG3857, CRS::EPSG4756) => todo!(),
-            // (CRS::EPSG4756, CRS::EPSG4326) => todo!(),
-            // (CRS::EPSG4756, CRS::EPSG3857) => todo!(),
-            // (CRS::EPSG4756, CRS::EPSG4756) => *self,
+            (CRS::EPSG3857, CRS::EPSG3857) => *self, //coord_3857.coord
+                                                     // (CRS::EPSG3857, CRS::EPSG4756) => todo!(),
+                                                     // (CRS::EPSG4756, CRS::EPSG4326) => todo!(),
+                                                     // (CRS::EPSG4756, CRS::EPSG3857) => todo!(),
+                                                     // (CRS::EPSG4756, CRS::EPSG4756) => *self,
         }
     }
 }
@@ -164,5 +162,12 @@ impl approx::RelativeEq for KCoord {
     ) -> bool {
         &self.kind == &other.kind
             && Coord::relative_eq(&self.coord, &other.coord, epsilon, max_relative)
+    }
+}
+
+pub fn translate(coord: Coord, dx: f64, dy: f64) -> Coord {
+    Coord {
+        x: coord.x + dx,
+        y: coord.y + dy,
     }
 }
