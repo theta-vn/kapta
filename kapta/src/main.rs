@@ -154,15 +154,24 @@ pub fn App() -> impl IntoView {
                     class="absolute"
                     style:top="350px"
                     style:left="450px"
-                    style:width="2px"
-                    style:height="2px"
+                    style:width="6px"
+                    style:height="6px"
                     style:background="red"
                 ></div>
             </div>
+            <div
+                    class="absolute"
+                    style:top="350px"
+                    style:left="450px"
+                    style:width="6px"
+                    style:height="6px"
+                    style:background="red"
+                ></div>
             <div  
                 class="absolute"
                 style:bottom="0px"
             >
+                <p>Transform</p>
                 <p>X: {move || x.get ()}</p>
                 <p>Y: {move || y.get ()}</p>
             </div>
