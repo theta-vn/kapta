@@ -1,6 +1,6 @@
 use geo_types::Coord;
 use kapta::view;
-use leptos::{ev::online, html::Div, *};
+use leptos::{html::Div, *};
 use serde::{Deserialize, Serialize};
 
 fn main() {
@@ -17,7 +17,6 @@ pub struct KaptaState {
 
 #[component]
 pub fn App() -> impl IntoView {
-    let (loaded, setLoaded) = create_signal(false);
     let state = create_rw_signal(KaptaState::default());
     let (center, setCenter) = create_slice(
         state,
@@ -45,7 +44,7 @@ pub fn App() -> impl IntoView {
     // log::debug!("{:#?}", state);
     let h: u32 = 700;
     let w: u32 = 900;
-    let z: u8 = 1;
+    let z: u8 = 7;
     let ct: Coord = (106.645, 10.788).into();
 
     let node_ref = create_node_ref::<Div>();
@@ -53,7 +52,6 @@ pub fn App() -> impl IntoView {
     setZoom.set(z);
 
     create_effect(move |_| {
-        log::debug!("EFFECT========================={}", zoom.get());
         let view = view::render(w, h, zoom.get(), ct);
         setCenter.set(view.center);
         setArray.set(view.array);
@@ -81,7 +79,7 @@ pub fn App() -> impl IntoView {
                 <button
                     class="bg-primary-80 block m-2 w-8 h-8"
                     on:click=move |_| {
-                        log::debug!("CLICK {}", zoom.get());                        
+                        log::debug!("CLICK {}", zoom.get());
                         setZoom.set(zoom.get() - 1);
                     }
                 >
