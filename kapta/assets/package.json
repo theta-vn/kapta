@@ -1,0 +1,12 @@
+{
+  "name": "assets",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "tailwind": "npx tailwindcss -i ./globals.css -o ../style.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.1"
+  }
+}
