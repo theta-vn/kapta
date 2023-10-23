@@ -3,8 +3,9 @@ use kapta::view;
 use leptos::{html::Div, *};
 use serde::{Deserialize, Serialize};
 
-use leptos_use::{use_draggable_with_options, use_window, UseDraggableOptions, UseDraggableReturn};
+use leptos_use::{use_draggable_with_options, UseDraggableOptions, UseDraggableReturn};
 use leptos_use::core::Position;
+use web_sys::MouseEvent;
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
@@ -65,7 +66,7 @@ pub fn App() -> impl IntoView {
     //     log::debug!("{:#?}", e);
     // };
 
-    let UseDraggableReturn { x, y, style, .. } = use_draggable_with_options(
+    let UseDraggableReturn { x, y,  .. } = use_draggable_with_options(
         div_ref,
         UseDraggableOptions::default()
             .initial_value(Position {
@@ -75,18 +76,19 @@ pub fn App() -> impl IntoView {
             .prevent_default(true),
             // log::debug!("{:#}",)
     );
-    let pos = Position { x: 3.234, y: -1.223 };
+
 
     view! {
-       
+        <div class="p-4">
         <div
             class="relative overflow-hidden bg-primary-80"
             style:height=move || format!("{}px", h)
             style:width=move || format!("{}px", w)
             
-            // on:drap= move |ev: MouseEvent| {
-            //     log::debug!("{:#?}", ev);
-            // }
+            on:click= move |ev: MouseEvent| {                
+                log::debug!("{:#?}:{:#?}", ev.client_x(), ev.client_y());
+                log::debug!("{:#?}:{:#?}", ev.offset_x(), ev.offset_y());
+            }
             // node_ref=div_ref
         >
             <div id="control"
@@ -121,6 +123,9 @@ pub fn App() -> impl IntoView {
                 id="base"
                 node_ref=div_ref
                 class="top-0 left-0 z-0"
+                // class="top-0 left-0 z-0 absolute"
+                // style:height=move || format!("{}px", h)
+                // style:width=move || format!("{}px", w)
                 // style="transform: translate3d({}px, 0px, 0px); opacity: 1;"
                 style=move || format!("transform: translate3d({}px, {}px, 0px); opacity: 1;", x.get(), y.get())
             >
@@ -177,6 +182,7 @@ pub fn App() -> impl IntoView {
             </div>
         
         
+        </div>
         </div>
     }
     // view! {
