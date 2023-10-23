@@ -3,6 +3,9 @@ use kapta::view;
 use leptos::{html::Div, *};
 use serde::{Deserialize, Serialize};
 
+use leptos_use::{use_draggable_with_options, use_window, UseDraggableOptions, UseDraggableReturn};
+use leptos_use::core::Position;
+
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
     mount_to_body(|| leptos::view! { <App/> })
@@ -47,7 +50,7 @@ pub fn App() -> impl IntoView {
     let z: u8 = 7;
     let ct: Coord = (106.645, 10.788).into();
 
-    let node_ref = create_node_ref::<Div>();
+    let div_ref = create_node_ref::<Div>();
 
     setZoom.set(z);
 
@@ -57,40 +60,69 @@ pub fn App() -> impl IntoView {
         setArray.set(view.array);
     });
 
+    // let onDrag =move |e| {
+    //     log::debug!("{:#?}", 1);
+    //     log::debug!("{:#?}", e);
+    // };
+
+    let UseDraggableReturn { x, y, style, .. } = use_draggable_with_options(
+        div_ref,
+        UseDraggableOptions::default()
+            .initial_value(Position {
+                x: 0.,
+                y: 0.,
+            })
+            .prevent_default(true),
+            // log::debug!("{:#}",)
+    );
+    let pos = Position { x: 3.234, y: -1.223 };
+
     view! {
+       
         <div
-            class="mx-auto relative overflow-hidden bg-primary-80"
+            class="relative overflow-hidden bg-primary-80"
             style:height=move || format!("{}px", h)
             style:width=move || format!("{}px", w)
+            
+            // on:drap= move |ev: MouseEvent| {
+            //     log::debug!("{:#?}", ev);
+            // }
+            // node_ref=div_ref
         >
             <div id="control"
                 class="top-0 left-0 z-50 absolute"
             >
                 <button
-                    class="bg-primary-80 block m-2 w-8 h-8"
+                    class="bg-primary-80 block w-8 h-6"
                     on:click=move |_| {
                         log::debug!("CLICK {}", zoom.get());
                         setZoom.set(zoom.get() + 1);
 
                     }
                 >
-                    "+" {move || zoom.get()}
+                    "+"
                 </button>
                 <button
-                    class="bg-primary-80 block m-2 w-8 h-8"
+                    class="bg-primary-80 block w-8 h-6"
                     on:click=move |_| {
                         log::debug!("CLICK {}", zoom.get());
                         setZoom.set(zoom.get() - 1);
                     }
                 >
-                    "-"{move || zoom.get()}
+                    "-"
                 </button>
             </div>
+            // <div 
+            //         class="relative"
+            //         style:height=move || format!("{}px", h)
+            // style:width=move || format!("{}px", w)
+            // ></div>
             <div
                 id="base"
-                ref=node_ref
+                node_ref=div_ref
                 class="top-0 left-0 z-0"
-                style="transform: translate3d(0px, 0px, 0px); opacity: 1;"
+                // style="transform: translate3d({}px, 0px, 0px); opacity: 1;"
+                style=move || format!("transform: translate3d({}px, {}px, 0px); opacity: 1;", x.get(), y.get())
             >
                 {move || array.get().iter().map(|data| {
                         let trans_x = (w / 2 - 128) as f64
@@ -127,7 +159,15 @@ pub fn App() -> impl IntoView {
                     style:background="red"
                 ></div>
             </div>
-        // </div>
+            <div  
+                class="absolute"
+                style:bottom="0px"
+            >
+                <p>X: {move || x.get ()}</p>
+                <p>Y: {move || y.get ()}</p>
+            </div>
+        
+        
         </div>
     }
     // view! {
