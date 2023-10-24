@@ -27,20 +27,18 @@ impl TView {
         let tl_proj = Coord {
             x: (center_proj.x - dx).floor(),
             y: center_proj.y - dy,
-        }; //translate(center_proj, -dx, -dy);
+        }; 
         let br_proj = Coord {
             x: center_proj.x + dx,
             y: center_proj.y + dy,
-        }; //translate(center_proj, dx, dy);
-        dbg!(center_proj, tl_proj, br_proj);
-        // let tl_coord = tl_kc_3876.to_tile_coord(zoom);
-        // let br_coord = br_kc_3876.to_tile_coord(zoom);
-        // dbg!(center, tl_coord, br_coord);
+        }; 
+        
+        
         let length_x = br_proj.x as i64 - tl_proj.x as i64 + 1;
         let length_y = br_proj.y as i64 - tl_proj.y as i64 + 1;
-        // dbg!(length_x, length_y);
+        
         let mut array: Vec<(u8, i64, i64, f64)> = [].to_vec();
-        // // let mut array_string: Vec<String> = [].to_vec();
+        
         let length_tile = (2 as i64).pow(zoom.into());
 
         for m in 0..length_y {

@@ -1,5 +1,5 @@
 use geo_types::Coord;
-use kapta::view;
+use kapta::{view, k_tile::TView, consts::{BOUND_LON_3857, BOUND_LAT_3857}, k_geo::{KCoord, CRS}};
 use leptos::{html::Div, *};
 use leptos_use::{use_draggable_with_options, UseDraggableOptions, UseDraggableReturn};
 
@@ -27,6 +27,13 @@ pub fn App() -> impl IntoView {
 
     setZoom.set(z);
 
+    let UseDraggableReturn {
+        x, y, is_dragging, ..
+    } = use_draggable_with_options(
+        div_ref,
+        UseDraggableOptions::default().prevent_default(true),
+    );
+
     create_effect(move |_| {
 
         // Chi lay goc kapta lan dau
@@ -44,15 +51,22 @@ pub fn App() -> impl IntoView {
         setArray.set(view.array);
         
         
-        log::debug!("EFFECT:: {:#?}", array.get());
+        // 
+        {
+            // log::debug!("EFFECT:: {:#?}: {:#?}", x.get(), y.get());
+            let length__hafl_tile = (2 as i64).pow((zoom.get()-1).into());
+            // let ratio = TView::tile_size(length_tile as u64);
+            let pixel_x = BOUND_LON_3857 / 256. / length__hafl_tile as f64;
+            let pixel_y = BOUND_LAT_3857 / 256. / length__hafl_tile as f64;
+            // log::debug!("EFFECT:: {:#?}:{:#?}", x.get() * pixel_x, y.get()*pixel_y);
+            let proj = Coord{x: x.get() * pixel_x, y: y.get()*pixel_y};
+            let center_3857 = KCoord::from(ct).to_proj_coord();
+            let center_new = Coord{x: center_3857.x - proj.x, y: center_3857.y - proj.y};
+            log::debug!("{:#?}:{:#?}", center_3857, center_new);
+        }
     });
 
-    let UseDraggableReturn {
-        x, y, is_dragging, ..
-    } = use_draggable_with_options(
-        div_ref,
-        UseDraggableOptions::default().prevent_default(true),
-    );
+    
 
     view! {
         <div class="">
