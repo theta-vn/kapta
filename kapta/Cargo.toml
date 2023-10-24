@@ -11,7 +11,7 @@ readme = "../README.md"
 
 [dependencies]
 leptos = {version = "0.5.1",  features = ["csr"]}
-leptos-use = "0.7"
+leptos-use = { path = "../../leptos-use",  version = "0.8"}
 serde = "1.0.163"
 log = "0.4.6"
 wasm-logger = "0.2.0"

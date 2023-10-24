@@ -1,51 +1,23 @@
 use geo_types::Coord;
 use kapta::view;
 use leptos::{html::Div, *};
-use serde::{Deserialize, Serialize};
+use leptos_use::{use_draggable_with_options, UseDraggableOptions, UseDraggableReturn, core::Position};
 
-use leptos_use::{use_draggable_with_options, UseDraggableOptions, UseDraggableReturn};
-use leptos_use::core::Position;
-use web_sys::MouseEvent;
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
     mount_to_body(|| leptos::view! { <App/> })
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, Clone)]
-pub struct KaptaState {
-    pub center: Coord,
-    pub zoom: u8,
-    pub array: Vec<(u8, i64, i64, f64)>,
-}
-
 #[component]
 pub fn App() -> impl IntoView {
-    let state = create_rw_signal(KaptaState::default());
-    let (center, setCenter) = create_slice(
-        state,
-        |state| state.center.clone(),
-        |state, center| {
-            state.center = center;
-        },
-    );
+    let (center, setCenter) = create_signal(Coord { x: 0., y: 0. });
+    let (zoom, setZoom) = create_signal(0);
+    let slice: Vec<(u8, i64, i64, f64)> = [].to_vec();
+    let (topleft, setTopleft) = create_signal(Coord { x: 0., y: 0. });
 
-    let (zoom, setZoom) = create_slice(
-        state,
-        |state| state.zoom.clone(),
-        |state, zoom| {
-            state.zoom = zoom;
-        },
-    );
+    let (array, setArray) = create_signal(slice);
 
-    let (array, setArray) = create_slice(
-        state,
-        |state| state.array.clone(),
-        |state, array| {
-            state.array = array;
-        },
-    );
-    // log::debug!("{:#?}", state);
     let h: u32 = 700;
     let w: u32 = 900;
     let z: u8 = 7;
@@ -59,40 +31,27 @@ pub fn App() -> impl IntoView {
         let view = view::render(w, h, zoom.get(), ct);
         setCenter.set(view.center);
         setArray.set(view.array);
+        let bound = div_ref.get().unwrap().get_bounding_client_rect();
+        setTopleft.set(Coord {
+            y: bound.top(),
+            x: bound.left(),
+        })
     });
 
-    // let onDrag =move |e| {
-    //     log::debug!("{:#?}", 1);
-    //     log::debug!("{:#?}", e);
-    // };
-
-    let UseDraggableReturn { x, y,  .. } = use_draggable_with_options(
+    let UseDraggableReturn { x, y, .. } = use_draggable_with_options(
         div_ref,
-        UseDraggableOptions::default()
-            .initial_value(Position {
-                x: 0.,
-                y: 0.,
-            })
-            .prevent_default(true),
-            // log::debug!("{:#}",)
+        UseDraggableOptions::default().prevent_default(true)//.initial_value(Position {x: -84.5, y: 0. }),
     );
 
-
     view! {
-        <div class="p-4">
+        <div class="">
         <div
-            class="relative overflow-hidden bg-primary-80"
+            class="mx-auto relative overflow-hidden bg-primary-80"
             style:height=move || format!("{}px", h)
             style:width=move || format!("{}px", w)
-            
-            on:click= move |ev: MouseEvent| {                
-                log::debug!("{:#?}:{:#?}", ev.client_x(), ev.client_y());
-                log::debug!("{:#?}:{:#?}", ev.offset_x(), ev.offset_y());
-            }
-            // node_ref=div_ref
         >
             <div id="control"
-                class="top-0 left-0 z-50 absolute"
+                class="top-0 right-0 z-50 absolute"
             >
                 <button
                     class="bg-primary-80 block w-8 h-6"
@@ -114,21 +73,21 @@ pub fn App() -> impl IntoView {
                     "-"
                 </button>
             </div>
-            // <div 
-            //         class="relative"
-            //         style:height=move || format!("{}px", h)
-            // style:width=move || format!("{}px", w)
-            // ></div>
+
             <div
                 id="base"
                 node_ref=div_ref
-                class="top-0 left-0 z-0"
-                // class="top-0 left-0 z-0 absolute"
-                // style:height=move || format!("{}px", h)
-                // style:width=move || format!("{}px", w)
-                // style="transform: translate3d({}px, 0px, 0px); opacity: 1;"
-                style=move || format!("transform: translate3d({}px, {}px, 0px); opacity: 1;", x.get(), y.get())
+                class="z-0"
+                style=move || format!("transform: translate3d({}px, {}px, 0px); opacity: 1;", x.get() - topleft.get().x , y.get() - topleft.get().y)
+                style=move || format!("top:{}px; left:{}px", topleft.get().x , topleft.get().y)
+                // style=move || format!("transform: translate3d({}px, {}px, 0px); opacity: 1;", x.get()  , y.get() )
+
+                // on:click= move |ev: MouseEvent| {
+                //     log::debug!("Clien::{:#?}:{:#?}", ev.client_x(), ev.client_y());
+                //     log::debug!("Offset::{:#?}:{:#?}", ev.offset_x(), ev.offset_y());
+                // }
             >
+
                 {move || array.get().iter().map(|data| {
                         let trans_x = (w / 2 - 128) as f64
                             + (data.1 as f64 + 0.5 - center.get().x) * 255.;
@@ -172,20 +131,19 @@ pub fn App() -> impl IntoView {
                     style:height="6px"
                     style:background="red"
                 ></div>
-            <div  
+            <div
                 class="absolute"
                 style:bottom="0px"
             >
                 <p>Transform</p>
-                <p>X: {move || x.get ()}</p>
-                <p>Y: {move || y.get ()}</p>
+                <p>X: {move || x.get()}</p>
+                <p>Y: {move || y.get()}</p>
+                <p>boundX: {move || topleft.get().x}</p>
+                <p>boundY: {move || topleft.get().y}</p>
             </div>
-        
-        
+
+
         </div>
         </div>
     }
-    // view! {
-    //     "cai gi day"
-    // }
 }
