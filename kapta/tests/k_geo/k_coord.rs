@@ -35,6 +35,6 @@ fn proj() {
     let proj = coord.to_proj_coord();
     dbg!(proj);
 
-    let re = coord.to_tile_coord(2);
-    dbg!(re);
+    // let re = coord.to_tile_coord(2);
+    // dbg!(re);
 }

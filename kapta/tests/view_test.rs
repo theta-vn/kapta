@@ -1,5 +1,5 @@
 use geo_types::Coord;
-use kapta::{view, k_view::KView};
+use kapta::k_view::KView;
 #[test]
 fn render() {
     let height: u32 = 700;

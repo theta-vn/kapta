@@ -1,8 +1,11 @@
 #[warn(unused_variables)]
 use geo_types::Coord;
-use kapta::k_view::{KCollection, KView};
+use kapta::{
+    k_geo::{KProj, KCoord, CRS},
+    k_view::{KCollection, KView},
+};
 use leptos::{html::Div, *};
-use leptos_use::{use_draggable_with_options, UseDraggableOptions, UseDraggableReturn};
+use leptos_use::{use_draggable_with_options, UseDraggableOptions, UseDraggableReturn, core::Position};
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
@@ -23,11 +26,12 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: Coord) -> impl IntoView 
     let (zoom, set_zoom) = create_signal(zoom);
     let (view, set_view) = create_signal(KView::default());
     let (collection, set_collection) = create_signal(KCollection::default());
+    let (new_center, set_new_center) = create_signal(KProj::default());
 
     let div_ref = create_node_ref::<Div>();
 
     let UseDraggableReturn {
-        x, y, is_dragging, ..
+        position, set_position, is_dragging, ..
     } = use_draggable_with_options(
         div_ref,
         UseDraggableOptions::default().prevent_default(true),
@@ -41,46 +45,53 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: Coord) -> impl IntoView 
                 y: bound.top(),
                 x: bound.left(),
             });
+            // let kview = KView::new(center, topleft.get(), width, height, zoom.get());
+            let center_k3857 = KCoord::from(center).transformed(CRS::EPSG3857);
+            let center_p3857 = KProj::from(center_k3857);
+            set_new_center.set(center_p3857);
             set_loading.set(false);
         }
 
-        let kview = KView::new(center, topleft.get(), width, height, zoom.get());
-        set_view.set(kview);
-        let kcollection = view.get().new_collection();
-        set_collection.set(kcollection);
-        // // set_tiles.set(tview.to_vec_tile(w, h, topleft.get().x, topleft.get().y));
-        log::debug!("{:#?}", view.get());
-        log::debug!("{:#?}", collection.get());
+        {
+            // First || zoom || end drap ELSE drapping
+            if !is_dragging.get() && !loading.get() {
+                let kview = KView::new(new_center.get(), topleft.get(), width, height, zoom.get());
+                set_view.set(kview);
+                // log::debug!("{:#?}", view.get());
+                log::debug!("END DRAP");
+                if position.get().x != 0. || position.get().y != 0. {
+                    // let kview = KView::new(center, topleft.get(), width, height, zoom.get());
+                    // set_view.set(kview);
+                    let kview = KView::new(new_center.get(), topleft.get(), width, height, zoom.get());
+                    set_view.set(kview);
+                    set_position.set(Position::default());
 
-        // {
-        //     if is_dragging.get() {
-        //         let length__hafl_tile = (2 as i64).pow((zoom.get() - 1).into());
-        //         let pixel_x = BOUND_LON_3857 / 256. / length__hafl_tile as f64;
-        //         let pixel_y = BOUND_LAT_3857 / 256. / length__hafl_tile as f64;
+                    // let mut kview = view.get();
+                    // kview.change_center(new_center.get());
+                    // log::debug!("{:#?}",kview);
+                }
 
-        //         let dproj = Coord {
-        //             x: x.get() * pixel_x,
-        //             y: y.get() * pixel_y,
-        //         };
-        //         let proj_3857 = KCoord::from(ct).to_proj_coord();
-        //         let proj_3857_new = Coord {
-        //             x: proj_3857.x - dproj.x,
-        //             y: proj_3857.y - dproj.y,
-        //         };
-        //         // log::debug!("{:#?}:{:#?}", proj_3857, proj_3857_new);
-        //         let bound_rec = bound_rec_tile(proj_3857_new, zoom.get(), w, h);
-        //         let change = view.get().extent_bound(bound_rec);
+                let kcollection = view.get().new_collection();
+                set_collection.set(kcollection);
+            } else {
+                let (check, top_left, center, bottom_right, new_center) =
+                    view.get().drap_change_bound(position.get().x, position.get().y);
 
-        //         if change {
-        //             // TODO: get new tile
-        //             let tview = TView::load(proj_3857_new, zoom.get(), w, h);
-        //             let ktiles = tview.to_k_tile_collect(w, h, Coord { x: topleft.get().x, y: topleft.get().y });
+                // log::debug!("{:#?}", new_center);
+                set_new_center.set(new_center);
+                if check {
+                    let change = view.get().change_collection(
+                        bottom_right,
+                        center,
+                        top_left,
+                        collection.get(),
+                    );
 
-        //             log::debug!("{:#?}", ktiles);
-        //             // set_view.set(tview);
-        //         }
-        //     }
-        // }
+                    log::debug!("{:#?}", &change);
+                    set_collection.set(change);
+                }
+            }
+        }
     });
 
     view! {
@@ -99,7 +110,6 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: Coord) -> impl IntoView 
                     on:click=move |_| {
                         log::debug!("CLICK {}", zoom.get());
                         set_zoom.set(zoom.get() + 1);
-
                     }
                 >
                     "+"
@@ -122,7 +132,7 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: Coord) -> impl IntoView 
 
                 // style:height=move || format!("{}px", h)
                 // style:width=move || format!("{}px", w)
-                style:transform=move || format!("translate3d({}px, {}px, 0px)", x.get() - topleft.get().x, y.get() - topleft.get().y)
+                style:transform=move || format!("translate3d({}px, {}px, 0px)", position.get().x - topleft.get().x, position.get().y - topleft.get().y)
             >
 
                 {
@@ -163,22 +173,22 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: Coord) -> impl IntoView 
                 class="absolute"
                 style:bottom="0px"
             >
-                <p>X: {move || x.get()}</p>
-                <p>Y: {move || y.get()}</p>
+                <p>X: {move || position.get().x}</p>
+                <p>Y: {move || position.get().y}</p>
                 <p>tlX: {move || topleft.get().x}</p>
                 <p>ltY: {move || topleft.get().y}</p>
             </div>
 
-            // <div
-            //     class="absolute"
-            //     style:bottom="0px"
-            //     style:right="0px"
-            // >
-            //     <p>Center: {move || format!("{:.2}#{:.2}",view.get().center.x, view.get().center.y)}</p>
-            //     <p>TopLeft: {move || format!("{:.2}#{:.2}",view.get().top_left.x, view.get().top_left.y)}</p>
-            //     <p>BotomRight: {move || format!("{:.2}#{:.2}",view.get().bottom_right.x, view.get().bottom_right.y)}</p>
-            //     <p>is_dragging: {move || is_dragging.get()}</p>
-            // </div>
+            <div
+                class="absolute"
+                style:bottom="0px"
+                style:right="0px"
+            >
+                <p>Center: {move || format!("{:.2}#{:.2}",view.get().center.coord.x, view.get().center.coord.y)}</p>
+                <p>TopLeft: {move || format!("{:.2}#{:.2}",view.get().top_left.coord.x, view.get().top_left.coord.y)}</p>
+                <p>BotomRight: {move || format!("{:.2}#{:.2}",view.get().bottom_right.coord.x, view.get().bottom_right.coord.y)}</p>
+                <p>is_dragging: {move || is_dragging.get()}</p>
+            </div>
 
 
         </div>

@@ -2,7 +2,7 @@ use geo_types::Coord;
 // use proj::Transform;
 use std::fmt;
 
-use crate::{consts::TILE, k_tile::TView};
+// use crate::{consts::TILE, k_tile::TView};
 pub const BOUND_LON_3857: f64 = 20_048_966.1;
 pub const BOUND_LAT_3857: f64 = 20_037_508.34;
 pub const PI: f64 = std::f64::consts::PI;
@@ -55,15 +55,15 @@ impl KCoord {
         }
     }
 
-    pub fn translate3d(&self, zoom: u8) -> (u32, u32) {
-        let length_tile = (2 as u64).pow(zoom.into());
-        let (tile_width, tile_heigth) = TView::tile_size(length_tile);
-        let cx_tile = self.coord.x / tile_width;
-        let cy_tile = self.coord.y / tile_heigth;
-        let x_translate = (cx_tile.fract() * TILE as f64) as u32;
-        let y_translate = ((1.0 - cy_tile.fract()) * TILE as f64) as u32;
-        (x_translate, y_translate)
-    }
+    // pub fn translate3d(&self, zoom: u8) -> (u32, u32) {
+    //     let length_tile = (2 as u64).pow(zoom.into());
+    //     let (tile_width, tile_heigth) = TView::tile_size(length_tile);
+    //     let cx_tile = self.coord.x / tile_width;
+    //     let cy_tile = self.coord.y / tile_heigth;
+    //     let x_translate = (cx_tile.fract() * TILE as f64) as u32;
+    //     let y_translate = ((1.0 - cy_tile.fract()) * TILE as f64) as u32;
+    //     (x_translate, y_translate)
+    // }
 
     pub fn to_proj_coord(&self) -> Coord {
         let c = self.transformed(CRS::EPSG3857);
@@ -72,11 +72,11 @@ impl KCoord {
         Coord { x, y }
     }
 
-    pub fn to_tile_coord(&self, zoom: u8) -> Coord {
-        let coord_proj = self.to_proj_coord();
+    // pub fn to_tile_coord(&self, zoom: u8) -> Coord {
+    //     let coord_proj = self.to_proj_coord();
 
-        proj_to_tile(coord_proj, zoom)
-    }
+    //     proj_to_tile(coord_proj, zoom)
+    // }
 
     pub fn transformed(&self, crs: CRS) -> Self {
         match (&self.kind, crs) {
@@ -145,15 +145,15 @@ pub fn translate(coord: Coord, dx: f64, dy: f64) -> Coord {
     }
 }
 
-pub fn proj_to_tile(proj: Coord, zoom: u8) -> Coord {
-    let length_tile = (2 as u64).pow(zoom.into());
-    let (tile_width, tile_heigth) = TView::tile_size(length_tile);
+// pub fn proj_to_tile(proj: Coord, zoom: u8) -> Coord {
+//     let length_tile = (2 as u64).pow(zoom.into());
+//     let (tile_width, tile_heigth) = TView::tile_size(length_tile);
 
-    let cx_tile = proj.x / tile_width;
-    let cy_tile = proj.y / tile_heigth;
+//     let cx_tile = proj.x / tile_width;
+//     let cy_tile = proj.y / tile_heigth;
 
-    Coord {
-        x: cx_tile,
-        y: cy_tile,
-    }
-}
+//     Coord {
+//         x: cx_tile,
+//         y: cy_tile,
+//     }
+// }

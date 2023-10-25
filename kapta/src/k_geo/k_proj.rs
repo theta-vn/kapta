@@ -14,7 +14,7 @@ pub enum Proj {
 pub struct KProj {
     pub coord: Coord,
     pub kind: Proj,
-    pub distance2: f64
+    pub distance2: f64,
 }
 
 impl From<KCoord> for KProj {
@@ -25,12 +25,25 @@ impl From<KCoord> for KProj {
         Self {
             coord: Coord { x, y },
             kind: Proj::default(),
-            distance2: 0.
+            distance2: 0.,
         }
     }
 }
 
 impl KProj {
+    pub fn new(x: f64, y: f64) -> Self {
+        Self {
+            coord: Coord { x, y },
+            kind: Proj::EPSG3857,
+            distance2: 0.,
+        }
+    }
+
+    pub fn similar(&self, other: KProj) -> bool {
+        self.coord.x as i64 == other.coord.x as i64 && self.coord.y as i64 == other.coord.y as i64
+    }
+
+
     pub fn to_tile(&self, zoom: u8) -> Self {
         match self.kind {
             Proj::EPSG3857 => {
@@ -45,7 +58,7 @@ impl KProj {
                         y: cy_tile,
                     },
                     kind: Proj::Tile,
-                    distance2: 0.
+                    distance2: 0.,
                 }
             }
             Proj::Tile => *self,
@@ -70,13 +83,13 @@ impl KProj {
             KProj {
                 coord: tl_tile,
                 kind: Proj::Tile,
-                distance2: 0.
+                distance2: 0.,
             },
             center_tile,
             KProj {
                 coord: br_tile,
                 kind: Proj::Tile,
-                distance2: 0.
+                distance2: 0.,
             },
         )
     }
