@@ -74,31 +74,9 @@ impl KCoord {
 
     pub fn to_tile_coord(&self, zoom: u8) -> Coord {
         let coord_proj = self.to_proj_coord();
-        let length_tile = (2 as u64).pow(zoom.into());
-        let (tile_width, tile_heigth) = TView::tile_size(length_tile);
 
-        let cx_tile = coord_proj.x / tile_width;
-        let cy_tile = coord_proj.y / tile_heigth;
-
-        Coord {
-            x: cx_tile,
-            y: cy_tile,
-        }
+        proj_to_tile(coord_proj, zoom)
     }
-
-    // pub fn transformed_crs_to_crs(&self, crs: CRS) -> Self {
-    //     let coord = self.coord;
-    //     match coord.transformed_crs_to_crs(&self.kind.to_string(), &crs.to_string()) {
-    //         Ok(coord) => Self {
-    //             coord: coord,
-    //             kind: crs,
-    //         },
-    //         Err(_) => Self {
-    //             coord: self.coord,
-    //             kind: CRS::Error,
-    //         },
-    //     }
-    // }
 
     pub fn transformed(&self, crs: CRS) -> Self {
         match (&self.kind, crs) {
@@ -114,7 +92,6 @@ impl KCoord {
                     kind: crs,
                 }
             }
-            // (CRS::EPSG4326, CRS::EPSG4756) => todo!(),
             (CRS::EPSG3857, CRS::EPSG4326) => {
                 let lon = (self.coord.x / BOUND_LON_3857) * 180_f64;
                 let lat_degrees = (self.coord.y / BOUND_LAT_3857) * 90_f64;
@@ -124,11 +101,7 @@ impl KCoord {
                     kind: crs,
                 }
             }
-            (CRS::EPSG3857, CRS::EPSG3857) => *self, //coord_3857.coord
-                                                     // (CRS::EPSG3857, CRS::EPSG4756) => todo!(),
-                                                     // (CRS::EPSG4756, CRS::EPSG4326) => todo!(),
-                                                     // (CRS::EPSG4756, CRS::EPSG3857) => todo!(),
-                                                     // (CRS::EPSG4756, CRS::EPSG4756) => *self,
+            (CRS::EPSG3857, CRS::EPSG3857) => *self,
         }
     }
 }
@@ -169,5 +142,18 @@ pub fn translate(coord: Coord, dx: f64, dy: f64) -> Coord {
     Coord {
         x: coord.x + dx,
         y: coord.y + dy,
+    }
+}
+
+pub fn proj_to_tile(proj: Coord, zoom: u8) -> Coord {
+    let length_tile = (2 as u64).pow(zoom.into());
+    let (tile_width, tile_heigth) = TView::tile_size(length_tile);
+
+    let cx_tile = proj.x / tile_width;
+    let cy_tile = proj.y / tile_heigth;
+
+    Coord {
+        x: cx_tile,
+        y: cy_tile,
     }
 }

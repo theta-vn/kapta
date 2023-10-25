@@ -60,9 +60,9 @@ pub fn App() -> impl IntoView {
             let pixel_y = BOUND_LAT_3857 / 256. / length__hafl_tile as f64;
             // log::debug!("EFFECT:: {:#?}:{:#?}", x.get() * pixel_x, y.get()*pixel_y);
             let proj = Coord{x: x.get() * pixel_x, y: y.get()*pixel_y};
-            let center_3857 = KCoord::from(ct).to_proj_coord();
-            let center_new = Coord{x: center_3857.x - proj.x, y: center_3857.y - proj.y};
-            log::debug!("{:#?}:{:#?}", center_3857, center_new);
+            let proj_3857 = KCoord::from(ct).to_proj_coord();
+            let proj_3857_new = Coord{x: proj_3857.x - proj.x, y: proj_3857.y - proj.y};
+            log::debug!("{:#?}:{:#?}", proj_3857, proj_3857_new);
         }
     });
 
