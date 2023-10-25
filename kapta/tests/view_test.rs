@@ -1,11 +1,19 @@
 use geo_types::Coord;
-use kapta::view;
+use kapta::{view, k_view::KView};
 #[test]
 fn render() {
-    let h: u32 = 700;
-    let w: u32 = 900;
-    let zoom: u8 = 19;
+    let height: u32 = 700;
+    let width: u32 = 900;
+    let zoom: u8 = 3;
     let center: Coord = (107., 17.).into();
-    let _view = view::render(w, h, zoom, center);
-    // dbg!(view);
+    let topleft: Coord = (80., 80.).into();    
+    
+    let kview = KView::new(center, topleft, width, height, zoom);
+    dbg!(&kview);
+    let kcollection = kview.new_collection();
+    dbg!(&kcollection);
+    let vec_img = kview.to_img(kcollection);
+    dbg!(vec_img);
+
+
 }

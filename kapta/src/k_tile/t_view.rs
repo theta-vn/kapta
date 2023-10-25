@@ -7,9 +7,15 @@ use crate::{
     k_geo::{proj_to_tile, KCoord},
 };
 
+use super::{TileCollect, Tile, t_tile::{KTileCollect, KTile}};
+
+
+
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct TView {
     pub center: Coord,
+    pub top_left: Coord,
+    pub bottom_right: Coord,
     pub zoom: u8,
     pub array: Vec<(u8, i64, i64, f64)>,
 }
@@ -21,8 +27,7 @@ impl TView {
         (tile_width, tile_heigth)
     }
 
-    pub fn load(center: KCoord, zoom: u8, width: u32, heigth: u32) -> Self {
-        let center_proj = center.to_proj_coord();
+    pub fn load(center_proj: Coord, zoom: u8, width: u32, heigth: u32) -> Self {
         let center_proj_tile = proj_to_tile(center_proj, zoom);
 
         let (tl_proj_tile, br_proj_tile) = bound_rec_tile(center_proj, zoom, width, heigth);
@@ -54,9 +59,54 @@ impl TView {
 
         Self {
             center: center_proj_tile,
+            top_left: tl_proj_tile,
+            bottom_right: br_proj_tile,
             zoom,
             array: array,
         }
+    }
+
+    pub fn to_vec_tile(&self, width: u32, heigth: u32, topleft_x: f64, topleft_y: f64) -> TileCollect {
+        let mut vec_tile: Vec<Tile> = [].to_vec();
+        for data in &self.array {
+            let trans_x = (width / 2 - 128) as f64
+                + (data.1 as f64 + 0.5 - self.center.x) * 255. + topleft_x;
+            let trans_y = (heigth / 2 - 128) as f64
+                + (data.2 as f64 + 0.5 - self.center.y) * 255. + topleft_y;
+            let trans = format!("translate3d({}px, {}px, 0px)", trans_x, trans_y);
+            let count = (2 as i64).pow(self.zoom.into());
+            let url = format!(
+                "https://tile.openstreetmap.org/{}/{}/{}.png",
+                data.0,
+                (data.1 as i64).rem_euclid(count),
+                (data.2 as i64 % count),
+            );
+            vec_tile.push(Tile::new(&url, &trans))
+        };
+        
+        TileCollect { collection: vec_tile }
+    }
+
+    pub fn to_k_tile_collect(&self, width: u32, heigth: u32, top_left: Coord) -> KTileCollect {
+        let mut collection: Vec<KTile> = [].to_vec();
+        for data in &self.array {
+            collection.push(KTile { x: data.1, y: data.2, z: data.0 })
+        }
+        KTileCollect { collection, width, heigth, top_left, center: self.center }
+    }
+
+    pub fn similar_bound(&self, bound: (Coord, Coord)) -> bool {
+        self.top_left.x as i64 == bound.0.x as i64
+            && self.top_left.y as i64 == bound.0.y as i64
+            && self.bottom_right.x as i64 == bound.1.x as i64
+            && self.bottom_right.y as i64 == bound.1.y as i64
+    }
+
+    pub fn extent_bound(&self, bound: (Coord, Coord)) -> bool {
+        (self.top_left.x as i64) > (bound.0.x as i64)
+            || (self.top_left.y as i64) > (bound.0.y as i64)
+            || (self.bottom_right.x as i64) < (bound.1.x as i64)
+            || (self.bottom_right.y as i64) < (bound.1.y as i64)
     }
 }
 
