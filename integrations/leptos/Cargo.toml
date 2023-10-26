@@ -2,10 +2,14 @@
 name = "leptos_kapta"
 edition = "2021"
 version.workspace = true
+authors = ["LangPham"]
+license = "MIT"
+description = "Kapta ~ Inspired by leaflet"
+repository = "https://github.com/theta-vn/kapta"
 readme = "../../README.md"
 
 [dependencies]
-kapta = { version = "0.0.1" }
+kapta = { version = "0.0.2" }
 leptos = { version = "0.5", features = ["csr"] }
 leptos-use = { version = "0.8" }
 log = "0.4.6"

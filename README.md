@@ -9,8 +9,8 @@ Inspired by leaflet
 #### Cargo.toml
 
 ```toml
-kapta = {version = "0.0.1"}
-leptos_kapta = {version = "0.0.1"}
+kapta = {version = "0.0.2"}
+leptos_kapta = {version = "0.0.2"}
 leptos = {version = "0.5"}
 ```
 
@@ -41,6 +41,6 @@ pub fn App() -> impl IntoView {
 
 #### Result
 
-![PieChart](./examples/assets/integrate_leptos.png)
+![Leptos Example](./examples/assets/integrate_leptos.png)
 
 ## Currently the library is in the development stage
