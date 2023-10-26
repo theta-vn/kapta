@@ -41,6 +41,6 @@ pub fn App() -> impl IntoView {
 
 #### Result
 
-![PieChart](./examples/assets/integrate_leptos.png)
+![Leptos Example](./examples/assets/integrate_leptos.png)
 
 ## Currently the library is in the development stage
