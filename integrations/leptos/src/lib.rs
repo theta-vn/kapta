@@ -75,18 +75,17 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: KaptaCoord) -> impl Into
     });
 
     view! {
-        <div class="">
+
         <div
-            class="mx-auto relative bg-primary-80 mt-8" // overflow-hidden
-            // class="relative bg-primary-80" // overflow-hidden
+            style="position: relative; overflow: hidden; background-color: gray"
             style:height=move || format!("{}px", height)
             style:width=move || format!("{}px", width)
         >
-            <div id="control"
-                class="top-0 right-0 z-50 absolute"
+            <div id="kapta-control"                
+                style="position: absolute; z-index: 50; top: 0; right: 0;"
             >
-                <button
-                    class="bg-primary-80 block w-8 h-6"
+                <button                    
+                    style="width: 30px; height: 30px; background-color: gray; display: block"
                     on:click=move |_| {
                         log::debug!("CLICK {}", zoom.get());
                         set_zoom.set(zoom.get() + 1);
@@ -94,8 +93,8 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: KaptaCoord) -> impl Into
                 >
                     "+"
                 </button>
-                <button
-                    class="bg-primary-80 block w-8 h-6"
+                <button                    
+                    style="width: 30px; height: 30px; background-color: gray; display: block"
                     on:click=move |_| {
                         log::debug!("CLICK {}", zoom.get());
                         set_zoom.set(zoom.get() - 1);
@@ -107,61 +106,43 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: KaptaCoord) -> impl Into
 
             <div
             node_ref=div_ref
-                id="base"
-                class="z-0 relative"
-
-                // style:height=move || format!("{}px", h)
-                // style:width=move || format!("{}px", w)
+                id="kapta-base"
+                style="position: relative; z-index: 0;"
                 style:transform=move || format!("translate3d({}px, {}px, 0px)", position.get().x - topleft.get().x, position.get().y - topleft.get().y)
             >
-
                 {
                     move || view.get().to_img(collection.get()).iter().map(|(url, transform)| {
                         view! {
                             <img
-                                alt=""
-                                class="absolute top-0 left-0"
-                                style="width: 256px; height: 256px; opacity: 1;"
                                 src=url
                                 style:transform=transform
+                                style="position: absolute;top: 0px; left: 0px; width: 256px; height: 256px; opacity: 1;"
                             />
                         }
                     })
                     .collect::<Vec<_>>()
                 }
-
-
             </div>
             <div
-                    class="absolute"
+                    style:position="absolute"
                     style:top="345px"
                     style:left="445px"
                     style:width="10px"
                     style:height="10px"
                     style:background="red"
                     style:border-radius="5px"
-                ></div>
+                ></div>          
             <div
-                    class="absolute"
-                    style:top="0"
-                    style:left="0"
-                    style:width="900px"
-                    style:height="700px"
-                    style:border="solid"
-                ></div>
-            <div
-                class="absolute"
+                style:position="absolute"
                 style:bottom="0px"
             >
                 <p>X: {move || position.get().x}</p>
                 <p>Y: {move || position.get().y}</p>
-                <p>Z: {move || zoom.get()}</p>
-                <p>tlX: {move || topleft.get().x}</p>
-                <p>ltY: {move || topleft.get().y}</p>
+                <p>Z: {move || zoom.get()}</p>                
             </div>
 
             <div
-                class="absolute"
+                style:position="absolute"
                 style:bottom="0px"
                 style:right="0px"
             >
@@ -170,9 +151,7 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: KaptaCoord) -> impl Into
                 <p>BotomRight: {move || format!("{:.2}#{:.2}",view.get().bottom_right.coord.x, view.get().bottom_right.coord.y)}</p>
                 <p>is_dragging: {move || is_dragging.get()}</p>
             </div>
-
-
         </div>
-        </div>
+
     }
 }

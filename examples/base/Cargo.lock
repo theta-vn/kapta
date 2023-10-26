@@ -122,17 +122,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "base"
-version = "0.0.0"
-dependencies = [
- "kapta",
- "leptos",
- "leptos_kapta",
- "log",
- "wasm-logger",
-]
-
-[[package]]
 name = "base64"
 version = "0.21.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -802,7 +791,7 @@ dependencies = [
 
 [[package]]
 name = "kapta"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "approx",
  "geo",
@@ -852,6 +841,17 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
+]
+
+[[package]]
+name = "leptos-xample"
+version = "0.0.1"
+dependencies = [
+ "kapta",
+ "leptos",
+ "leptos_kapta",
+ "log",
+ "wasm-logger",
 ]
 
 [[package]]
@@ -917,7 +917,7 @@ dependencies = [
 
 [[package]]
 name = "leptos_kapta"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "kapta",
  "leptos",
