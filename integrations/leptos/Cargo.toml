@@ -5,8 +5,8 @@ version.workspace = true
 readme = "../../README.md"
 
 [dependencies]
-kapta = { workspace = true }
-leptos = {version = "0.5",  features = ["csr"]}
-leptos-use = {  version = "0.8"}
+kapta = { version = "0.0.1" }
+leptos = { version = "0.5", features = ["csr"] }
+leptos-use = { version = "0.8" }
 log = "0.4.6"
 wasm-logger = "0.2.0"
