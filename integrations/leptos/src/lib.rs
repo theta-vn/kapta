@@ -81,10 +81,10 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: KaptaCoord) -> impl Into
             style:height=move || format!("{}px", height)
             style:width=move || format!("{}px", width)
         >
-            <div id="kapta-control"                
+            <div id="kapta-control"
                 style="position: absolute; z-index: 50; top: 0; right: 0;"
             >
-                <button                    
+                <button
                     style="width: 30px; height: 30px; background-color: gray; display: block"
                     on:click=move |_| {
                         log::debug!("CLICK {}", zoom.get());
@@ -93,7 +93,7 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: KaptaCoord) -> impl Into
                 >
                     "+"
                 </button>
-                <button                    
+                <button
                     style="width: 30px; height: 30px; background-color: gray; display: block"
                     on:click=move |_| {
                         log::debug!("CLICK {}", zoom.get());
@@ -123,34 +123,34 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: KaptaCoord) -> impl Into
                     .collect::<Vec<_>>()
                 }
             </div>
-            <div
-                    style:position="absolute"
-                    style:top="345px"
-                    style:left="445px"
-                    style:width="10px"
-                    style:height="10px"
-                    style:background="red"
-                    style:border-radius="5px"
-                ></div>          
-            <div
-                style:position="absolute"
-                style:bottom="0px"
-            >
-                <p>X: {move || position.get().x}</p>
-                <p>Y: {move || position.get().y}</p>
-                <p>Z: {move || zoom.get()}</p>                
-            </div>
+            // <div
+            //         style:position="absolute"
+            //         style:top="345px"
+            //         style:left="445px"
+            //         style:width="10px"
+            //         style:height="10px"
+            //         style:background="red"
+            //         style:border-radius="5px"
+            //     ></div>
+            // <div
+            //     style:position="absolute"
+            //     style:bottom="0px"
+            // >
+            //     <p>X: {move || position.get().x}</p>
+            //     <p>Y: {move || position.get().y}</p>
+            //     <p>Z: {move || zoom.get()}</p>
+            // </div>
 
-            <div
-                style:position="absolute"
-                style:bottom="0px"
-                style:right="0px"
-            >
-                <p>Center: {move || format!("{:.2}#{:.2}",view.get().center.coord.x, view.get().center.coord.y)}</p>
-                <p>TopLeft: {move || format!("{:.2}#{:.2}",view.get().top_left.coord.x, view.get().top_left.coord.y)}</p>
-                <p>BotomRight: {move || format!("{:.2}#{:.2}",view.get().bottom_right.coord.x, view.get().bottom_right.coord.y)}</p>
-                <p>is_dragging: {move || is_dragging.get()}</p>
-            </div>
+            // <div
+            //     style:position="absolute"
+            //     style:bottom="0px"
+            //     style:right="0px"
+            // >
+            //     <p>Center: {move || format!("{:.2}#{:.2}",view.get().center.coord.x, view.get().center.coord.y)}</p>
+            //     <p>TopLeft: {move || format!("{:.2}#{:.2}",view.get().top_left.coord.x, view.get().top_left.coord.y)}</p>
+            //     <p>BotomRight: {move || format!("{:.2}#{:.2}",view.get().bottom_right.coord.x, view.get().bottom_right.coord.y)}</p>
+            //     <p>is_dragging: {move || is_dragging.get()}</p>
+            // </div>
         </div>
 
     }

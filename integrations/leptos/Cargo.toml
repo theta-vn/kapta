@@ -2,6 +2,7 @@
 name = "leptos_kapta"
 edition = "2021"
 version.workspace = true
+readme = "../../README.md"
 
 [dependencies]
 kapta = { workspace = true }

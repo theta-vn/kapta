@@ -1,6 +1,5 @@
 use crate::coords::ProjCoord;
 
-
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct SeriesPC {
     pub series: Vec<ProjCoord>,
