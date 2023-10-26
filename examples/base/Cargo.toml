@@ -1,0 +1,15 @@
+[package]
+name = "base"
+edition = "2021"
+version = "0.0.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+leptos_kapta = {path = "../../integrations/leptos"}
+kapta = {path = "../../kapta"}
+leptos = "0.5"
+# leptos = {version = "0.5.1",  features = ["csr"]}
+# leptos-use = {  version = "0.8"}
+log = "0.4.6"
+wasm-logger = "0.2.0"

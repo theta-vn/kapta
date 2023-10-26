@@ -1,7 +1,15 @@
 [workspace]
-members = ["kapta"]
+members = [
+    "kapta",
+    # integration
+    "integrations/leptos",
+]
 resolver = "2"
 
+exclude = ["benchmarks", "examples"]
 
 [workspace.package]
 version = "0.0.0"
+
+[workspace.dependencies]
+kapta = { path = "./kapta", version = "0.0.0" }

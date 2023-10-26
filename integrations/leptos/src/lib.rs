@@ -7,18 +7,6 @@ use leptos_use::{
     core::Position, use_draggable_with_options, UseDraggableOptions, UseDraggableReturn,
 };
 
-fn main() {
-    wasm_logger::init(wasm_logger::Config::default());
-    mount_to_body(|| leptos::view! { <App/> })
-}
-#[component]
-pub fn App() -> impl IntoView {
-    let center: KaptaCoord = KaptaCoord::new(106.645, 10.788);
-    view! {
-        <Kapta zoom=3 width=900 height=700 center=center/>
-    }
-}
-
 #[component]
 pub fn Kapta(zoom: u8, width: u32, height: u32, center: KaptaCoord) -> impl IntoView {
     let (loading, set_loading) = create_signal(true);
