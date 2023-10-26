@@ -9,8 +9,8 @@ Inspired by leaflet
 #### Cargo.toml
 
 ```toml
-kapta = {version = "0.0.1"}
-leptos_kapta = {version = "0.0.1"}
+kapta = {version = "0.0.2"}
+leptos_kapta = {version = "0.0.2"}
 leptos = {version = "0.5"}
 ```
 

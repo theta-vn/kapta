@@ -1,10 +1,11 @@
 [package]
 name = "kapta"
+version.workspace = true
 edition = "2021"
 authors = ["LangPham"]
 license = "MIT"
-description = "Kapta ~ Map"
-version.workspace = true
+description = "Kapta ~ Inspired by leaflet"
+repository = "https://github.com/theta-vn/kapta"
 readme = "../README.md"
 
 [dependencies]
