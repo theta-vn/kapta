@@ -1,33 +1,16 @@
-# Kapta
-
-Inspired by leaflet
-
-## Examples and Usage
-
-### Integrate leptos
-
-#### Cargo.toml
-
-```toml
-kapta = {version = "0.0.1"}
-leptos_kapta = {version = "0.0.1"}
-leptos = {version = "0.5"}
-```
-
-#### main.rs
-
-```rust
 use kapta::coords::KaptaCoord;
 use leptos::*;
 use leptos_kapta::Kapta;
 
-fn main() {    
+fn main() {
+    wasm_logger::init(wasm_logger::Config::default());
     mount_to_body(|| leptos::view! { <App/> })
 }
 
 #[component]
 pub fn App() -> impl IntoView {
     let center: KaptaCoord = KaptaCoord::new(106.645, 10.788);
+    
     view! {
         <div class="mx-auto">
             <h1 class="text-center m-8 text-2xl ">Example with leptos</h1>
@@ -37,10 +20,3 @@ pub fn App() -> impl IntoView {
         </div>
     }
 }
-```
-
-#### Result
-
-![PieChart](./examples/assets/integrate_leptos.png)
-
-## Currently the library is in the development stage
