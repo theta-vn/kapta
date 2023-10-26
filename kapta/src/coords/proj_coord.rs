@@ -1,6 +1,5 @@
-use super::{KCoord, CRS};
+use super::{Coord, KaptaCoord, CRS};
 use crate::consts::{BOUND_LAT_3857, BOUND_LON_3857, TILE};
-use geo_types::Coord;
 use std::ops::Div;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
@@ -11,14 +10,14 @@ pub enum Proj {
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-pub struct KProj {
+pub struct ProjCoord {
     pub coord: Coord,
     pub kind: Proj,
     pub distance2: f64,
 }
 
-impl From<KCoord> for KProj {
-    fn from(kcoord: KCoord) -> Self {
+impl From<KaptaCoord> for ProjCoord {
+    fn from(kcoord: KaptaCoord) -> Self {
         let c = kcoord.transformed(CRS::EPSG3857);
         let x = c.coord.x + BOUND_LON_3857;
         let y = BOUND_LAT_3857 - c.coord.y;
@@ -30,7 +29,7 @@ impl From<KCoord> for KProj {
     }
 }
 
-impl KProj {
+impl ProjCoord {
     pub fn new(x: f64, y: f64) -> Self {
         Self {
             coord: Coord { x, y },
@@ -39,10 +38,9 @@ impl KProj {
         }
     }
 
-    pub fn similar(&self, other: KProj) -> bool {
+    pub fn similar(&self, other: ProjCoord) -> bool {
         self.coord.x as i64 == other.coord.x as i64 && self.coord.y as i64 == other.coord.y as i64
     }
-
 
     pub fn to_tile(&self, zoom: u8) -> Self {
         match self.kind {
@@ -65,9 +63,14 @@ impl KProj {
         }
     }
 
-    pub fn bound_rec_tile(&self, zoom: u8, width: u32, heigth: u32) -> (KProj, KProj, KProj) {
+    pub fn bound_rec_tile(
+        &self,
+        zoom: u8,
+        width: u32,
+        heigth: u32,
+    ) -> (ProjCoord, ProjCoord, ProjCoord) {
         let center_tile = self.to_tile(zoom);
-        dbg!(center_tile);
+
         let dx = (width / 2 - 1) as f64 / TILE as f64;
         let dy = (heigth / 2 - 1) as f64 / TILE as f64;
 
@@ -80,13 +83,13 @@ impl KProj {
             y: center_tile.coord.y + dy,
         };
         (
-            KProj {
+            ProjCoord {
                 coord: tl_tile,
                 kind: Proj::Tile,
                 distance2: 0.,
             },
             center_tile,
-            KProj {
+            ProjCoord {
                 coord: br_tile,
                 kind: Proj::Tile,
                 distance2: 0.,
