@@ -5,7 +5,6 @@ version = "0.0.1"
 
 [dependencies]
 leptos_kapta = {path = "../../integrations/leptos"}
-kapta = {path = "../../kapta"}
 leptos = {version = "0.5"}
 log = "0.4.6"
 wasm-logger = "0.2.0"
