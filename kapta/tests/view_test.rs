@@ -1,5 +1,5 @@
 use kapta::{
-    coords::{Coord, KaptaCoord, ProjCoord, Proj},
+    coords::{Coord, KaptaCoord, Proj, ProjCoord},
     views::KaptaView,
 };
 #[test]
@@ -26,7 +26,7 @@ fn render() {
         kind: Proj::EPSG3857,
         distance2: 0.0,
     };
-    let view_new= KaptaView::new(center_p3857, topleft, width, height, zoom);
+    let view_new = KaptaView::new(center_p3857, topleft, width, height, zoom);
     dbg!(&view_new);
 
     let col = view_new.new_collection();
