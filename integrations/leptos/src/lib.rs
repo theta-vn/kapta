@@ -8,6 +8,12 @@ use leptos_use::{
     core::Position, use_draggable_with_options, UseDraggableOptions, UseDraggableReturn,
 };
 
+#[derive(PartialEq)]
+enum ButtonZoom {
+    Inc,
+    Des,
+}
+
 #[component]
 pub fn Kapta(zoom: u8, width: u32, height: u32, center: KaptaCoord) -> impl IntoView {
     let (loading, set_loading) = create_signal(true);
@@ -78,31 +84,15 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: KaptaCoord) -> impl Into
     view! {
 
         <div
-            style="position: relative; overflow: hidden; background-color: gray"
+            style="position: relative; overflow: hidden; background-color: aliceblue"
             style:height=move || format!("{}px", height)
             style:width=move || format!("{}px", width)
         >
             <div id="kapta-control"
                 style="position: absolute; z-index: 50; top: 0; right: 0;"
             >
-                <button
-                    style="width: 30px; height: 30px; background-color: gray; display: block"
-                    on:click=move |_| {
-                        log::debug!("CLICK {}", zoom.get());
-                        set_zoom.set(zoom.get() + 1);
-                    }
-                >
-                    "+"
-                </button>
-                <button
-                    style="width: 30px; height: 30px; background-color: gray; display: block"
-                    on:click=move |_| {
-                        log::debug!("CLICK {}", zoom.get());
-                        set_zoom.set(zoom.get() - 1);
-                    }
-                >
-                    "-"
-                </button>
+                <BZoom kind=ButtonZoom::Inc zoom=zoom set_zoom=set_zoom />
+                <BZoom kind=ButtonZoom::Des zoom=zoom set_zoom=set_zoom />
             </div>
 
             <div
@@ -124,35 +114,85 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: KaptaCoord) -> impl Into
                     .collect::<Vec<_>>()
                 }
             </div>
-            // <div
-            //         style:position="absolute"
-            //         style:top="345px"
-            //         style:left="445px"
-            //         style:width="10px"
-            //         style:height="10px"
-            //         style:background="red"
-            //         style:border-radius="5px"
-            //     ></div>
-            // <div
-            //     style:position="absolute"
-            //     style:bottom="0px"
-            // >
-            //     <p>X: {move || position.get().x}</p>
-            //     <p>Y: {move || position.get().y}</p>
-            //     <p>Z: {move || zoom.get()}</p>
-            // </div>
+            <div
+                    style:position="absolute"
+                    style:top="345px"
+                    style:left="445px"
+                    style:width="10px"
+                    style:height="10px"
+                    style:background="red"
+                    style:border-radius="5px"
+                ></div>
+            <div
+                style:position="absolute"
+                style:bottom="0px"
+            >
+                <p>X: {move || position.get().x}</p>
+                <p>Y: {move || position.get().y}</p>
+                <p>Z: {move || zoom.get()}</p>
+            </div>
 
-            // <div
-            //     style:position="absolute"
-            //     style:bottom="0px"
-            //     style:right="0px"
-            // >
-            //     <p>Center: {move || format!("{:.2}#{:.2}",view.get().center.coord.x, view.get().center.coord.y)}</p>
-            //     <p>TopLeft: {move || format!("{:.2}#{:.2}",view.get().top_left.coord.x, view.get().top_left.coord.y)}</p>
-            //     <p>BotomRight: {move || format!("{:.2}#{:.2}",view.get().bottom_right.coord.x, view.get().bottom_right.coord.y)}</p>
-            //     <p>is_dragging: {move || is_dragging.get()}</p>
-            // </div>
+            <div
+                style:position="absolute"
+                style:bottom="0px"
+                style:right="0px"
+            >
+                <p>Center: {move || format!("{:.2}#{:.2}",view.get().center.coord.x, view.get().center.coord.y)}</p>
+                <p>TopLeft: {move || format!("{:.2}#{:.2} {:#}",view.get().top_left.coord.x, view.get().top_left.coord.y, view.get().top_left.coord.y.floor())}</p>
+                <p>BotomRight: {move || format!("{:.2}#{:.2}",view.get().bottom_right.coord.x, view.get().bottom_right.coord.y)}</p>
+                <p>is_dragging: {move || is_dragging.get()}</p>
+            </div>
         </div>
 
+    }
+}
+
+#[component]
+fn BZoom(kind: ButtonZoom, zoom: ReadSignal<u8>, set_zoom: WriteSignal<u8>) -> impl IntoView {
+    let (zoom_in, set_zoom_in) = create_signal(true);
+    let (zoom_out, set_zoom_out) = create_signal(true);
+    create_effect(move |_| {
+        if zoom.get() > 1 {
+            set_zoom_in.set(true);
+        } else {
+            set_zoom_in.set(false);
+        }
+        if zoom.get() < 19 {
+            set_zoom_out.set(true);
+        } else {
+            set_zoom_out.set(false);
+        }
+    });
+
+    {
+        return move || {
+            if kind == ButtonZoom::Inc {
+                view! {
+                    <button
+                        style="width: 40px; height: 32px; display: block;border: solid 1px;border-radius: 5px;margin: 5px;"
+                        style:background={move || if zoom_out.get() {"white"} else {"gray"}}
+                        on:click=move |_| {
+                            set_zoom.update(|n| *n = *n +1);
+                        }
+                        disabled={!zoom_out.get()}
+                    >
+                        <b>"+"</b>
+                    </button>
+                }
+            } else {
+                view! {
+                    <button
+                        style="width: 40px; height: 32px; display: block;border: solid 1px;border-radius: 5px;margin: 5px;"
+                        style:background={move || if zoom_in.get() {"white"} else {"gray"}}
+                        on:click=move |_| {
+                            set_zoom.update(|n| *n = *n -1);
+                        }
+                        disabled={!zoom_in.get()}
+                    >
+                        <b>"-"</b>
+                    </button>
+                }
+            }
+        };
     }
 }

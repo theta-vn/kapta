@@ -39,15 +39,10 @@ impl KaptaView {
         }
     }
 
-    // TODO: doi center
-    // pub fn change_center(&mut self, center: KProj)  {
-    //     self.center_p3857 = center;
-    // }
-
     pub fn new_collection(&self) -> SeriesPC {
         let mut collection: Vec<ProjCoord> = [].to_vec();
         let length_x = self.bottom_right.coord.x as i64 - self.top_left.coord.x as i64 + 1;
-        let length_y = self.bottom_right.coord.y as i64 - self.top_left.coord.y as i64 + 1;
+        let length_y = self.bottom_right.coord.y.floor() as i64 - self.top_left.coord.y.floor() as i64 + 1;
 
         let length_tile = (2 as i64).pow(self.zoom.into());
 
@@ -79,8 +74,8 @@ impl KaptaView {
         top_left: ProjCoord,
     ) -> SeriesPC {
         let mut collection: Vec<ProjCoord> = [].to_vec();
-        let length_x = bottom_right.coord.x as i64 - top_left.coord.x as i64 + 1;
-        let length_y = bottom_right.coord.y as i64 - top_left.coord.y as i64 + 1;
+        let length_x = bottom_right.coord.x as u64 - top_left.coord.x as u64 + 1;
+        let length_y = bottom_right.coord.y.floor() as u64 - top_left.coord.y.floor() as u64 + 1;
 
         let length_tile = (2 as i64).pow(self.zoom.into());
 

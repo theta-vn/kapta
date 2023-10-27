@@ -17,9 +17,8 @@ leptos = {version = "0.5"}
 #### main.rs
 
 ```rust
-use kapta::coords::KaptaCoord;
 use leptos::*;
-use leptos_kapta::Kapta;
+use leptos_kapta::{Kapta, KaptaCoord};
 
 fn main() {    
     mount_to_body(|| leptos::view! { <App/> })
