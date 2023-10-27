@@ -4,7 +4,7 @@ version.workspace = true
 edition = "2021"
 authors = ["LangPham"]
 license = "MIT"
-description = "Kapta ~ Inspired by leaflet"
+description = "Kapta ~ Inspired by leaflet. Draw map with wasm"
 repository = "https://github.com/theta-vn/kapta"
 readme = "../README.md"
 

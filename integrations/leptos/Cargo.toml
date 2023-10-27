@@ -4,13 +4,12 @@ edition = "2021"
 version.workspace = true
 authors = ["LangPham"]
 license = "MIT"
-description = "Kapta ~ Inspired by leaflet"
+description = "Kapta ~ Inspired by leaflet. Draw map with wasm"
 repository = "https://github.com/theta-vn/kapta"
 readme = "../../README.md"
 
 [dependencies]
-kapta = { version = "0.0.2" }
+kapta = { version = "0.0.3" }
 leptos = { version = "0.5", features = ["csr"] }
 leptos-use = { version = "0.8" }
-log = "0.4.6"
-wasm-logger = "0.2.0"
+

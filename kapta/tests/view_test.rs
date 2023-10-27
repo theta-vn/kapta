@@ -1,5 +1,5 @@
 use kapta::{
-    coords::{Coord, KaptaCoord, ProjCoord},
+    coords::{Coord, KaptaCoord, Proj, ProjCoord},
     views::KaptaView,
 };
 #[test]
@@ -17,4 +17,18 @@ fn render() {
     dbg!(&kcollection);
     let vec_img = kview.to_img(kcollection);
     dbg!(vec_img);
+
+    let center_p3857 = ProjCoord {
+        coord: Coord {
+            x: 32084054.14618125,
+            y: 5797226.819944519,
+        },
+        kind: Proj::EPSG3857,
+        distance2: 0.0,
+    };
+    let view_new = KaptaView::new(center_p3857, topleft, width, height, zoom);
+    dbg!(&view_new);
+
+    let col = view_new.new_collection();
+    dbg!(col);
 }
