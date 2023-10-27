@@ -62,19 +62,35 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: KaptaCoord) -> impl Into
                         KaptaView::new(new_center.get(), topleft.get(), width, height, zoom.get());
                     set_view.set(kview);
                     set_position.set(Position::default());
+                    // log::debug!("{:#?}", new_center.get());
+                    // log::debug!("{:#?}", view.get());
                 }
 
                 let kcollection = view.get().new_collection();
                 set_collection.set(kcollection);
+                
             } else {
-                let (check, top_left, center, bottom_right, new_center) = view
+                let (check, top_left, center, bottom_right, proj_3857_new) = view
                     .get()
                     .drap_change_bound(position.get().x, position.get().y);
 
-                set_new_center.set(new_center);
+                set_new_center.set(proj_3857_new);
+                // let center_p3857 = ProjCoord {
+                //     coord: Coord {
+                //         x: 32084054.14618125,
+                //         y: 5797226.819944519,
+                //     },
+                //     kind: Proj::EPSG3857,
+                //     distance2: 0.0,
+                // };
+                // set_new_center.set(center_p3857);
                 if check {
+                    // let kview =
+                    //     KaptaView::new(new_center, topleft.get(), width, height, zoom.get());
+                    // set_view.set(kview);
+                    log::debug!("DRAP::{:#?}", ( top_left, center, bottom_right));
                     let change = view.get().change_collection(bottom_right, center, top_left);
-
+                    // log::debug!("DRAP::{:#?}", &change);
                     set_collection.set(change);
                 }
             }
@@ -130,6 +146,7 @@ pub fn Kapta(zoom: u8, width: u32, height: u32, center: KaptaCoord) -> impl Into
                 <p>X: {move || position.get().x}</p>
                 <p>Y: {move || position.get().y}</p>
                 <p>Z: {move || zoom.get()}</p>
+                <p>Center: {move || format!("{:.2}:{:.2}", new_center.get().coord.x,  new_center.get().coord.y)}</p>
             </div>
 
             <div

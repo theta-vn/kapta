@@ -43,7 +43,7 @@ impl KaptaView {
         let mut collection: Vec<ProjCoord> = [].to_vec();
         let length_x = self.bottom_right.coord.x as i64 - self.top_left.coord.x as i64 + 1;
         let length_y = self.bottom_right.coord.y.floor() as i64 - self.top_left.coord.y.floor() as i64 + 1;
-
+        dbg!(length_x, length_y);
         let length_tile = (2 as i64).pow(self.zoom.into());
 
         for m in 0..length_y {
@@ -77,12 +77,14 @@ impl KaptaView {
         let length_x = bottom_right.coord.x as u64 - top_left.coord.x as u64 + 1;
         let length_y = bottom_right.coord.y.floor() as u64 - top_left.coord.y.floor() as u64 + 1;
 
+
         let length_tile = (2 as i64).pow(self.zoom.into());
 
         for m in 0..length_y {
             for n in 0..length_x {
+                let hack_y = if top_left.coord.y < 0. {0.} else {top_left.coord.y};
                 let x = top_left.coord.x + n as f64;
-                let y = top_left.coord.y + m as f64;
+                let y = hack_y + m as f64;
                 if 0. <= y && y < length_tile as f64 {
                     let distance2 = (x.floor() + 0.5 - center.coord.x).powf(2.)
                         + (y.floor() + 0.5 - center.coord.y).powf(2.);
