@@ -1,6 +1,5 @@
-use kapta::coords::KaptaCoord;
 use leptos::*;
-use leptos_kapta::Kapta;
+use leptos_kapta::{Kapta, KaptaCoord};
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
@@ -10,7 +9,7 @@ fn main() {
 #[component]
 pub fn App() -> impl IntoView {
     let center: KaptaCoord = KaptaCoord::new(106.645, 10.788);
-    
+    log::debug!("{:#?}",&center);
     view! {
         <div class="mx-auto">
             <h1 class="text-center m-8 text-2xl ">Example with leptos</h1>

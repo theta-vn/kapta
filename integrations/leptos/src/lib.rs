@@ -1,5 +1,6 @@
+pub use kapta::coords::KaptaCoord;
 use kapta::{
-    coords::{Coord, KaptaCoord, ProjCoord},
+    coords::{Coord, ProjCoord},
     views::{KaptaView, SeriesPC},
 };
 use leptos::{html::Div, *};
