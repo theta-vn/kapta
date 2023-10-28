@@ -3,6 +3,7 @@ use leptos::*;
 #[component]
 pub fn TileLayer(view: ReadSignal<KaptaView>, collection: ReadSignal<SeriesPC>) -> impl IntoView {
     view! {
+        <div id="kapta-layer-base">
         {move || {
             view.get()
                 .to_img(collection.get())
@@ -11,6 +12,7 @@ pub fn TileLayer(view: ReadSignal<KaptaView>, collection: ReadSignal<SeriesPC>) 
                     view! {
                         <img
                             src=url
+                            loading="lazy"
                             style:transform=transform
                             style="position: absolute;top: 0px; left: 0px; width: 256px; height: 256px; opacity: 1;"
                         />
@@ -18,5 +20,6 @@ pub fn TileLayer(view: ReadSignal<KaptaView>, collection: ReadSignal<SeriesPC>) 
                 })
                 .collect::<Vec<_>>()
         }}
+        </div>
     }
 }

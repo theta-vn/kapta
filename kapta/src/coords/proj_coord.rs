@@ -68,6 +68,7 @@ impl ProjCoord {
         zoom: u8,
         width: u32,
         heigth: u32,
+        preload: u8
     ) -> (ProjCoord, ProjCoord, ProjCoord) {
         let center_tile = self.to_tile(zoom);
 
@@ -75,12 +76,12 @@ impl ProjCoord {
         let dy = (heigth / 2 - 1) as f64 / TILE as f64;
 
         let tl_tile = Coord {
-            x: center_tile.coord.x - dx,
-            y: center_tile.coord.y - dy,
+            x: center_tile.coord.x - dx - preload as f64,
+            y: center_tile.coord.y - dy - preload as f64,
         };
         let br_tile = Coord {
-            x: center_tile.coord.x + dx,
-            y: center_tile.coord.y + dy,
+            x: center_tile.coord.x + dx + preload as f64,
+            y: center_tile.coord.y + dy + preload as f64,
         };
         (
             ProjCoord {
