@@ -16,7 +16,6 @@ pub fn Control(zoom: ReadSignal<u8>, set_zoom: WriteSignal<u8>) -> impl IntoView
     }
 }
 
-
 #[component]
 fn BZoom(kind: ButtonZoom, zoom: ReadSignal<u8>, set_zoom: WriteSignal<u8>) -> impl IntoView {
     let (zoom_in, set_zoom_in) = create_signal(true);

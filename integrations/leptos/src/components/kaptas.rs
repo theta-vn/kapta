@@ -1,4 +1,5 @@
 use super::{Control, GeoJsonLayer, TileLayer};
+use geojson::FeatureCollection;
 pub use kapta::coords::KaptaCoord;
 use kapta::{
     coords::{Coord, ProjCoord},
@@ -15,6 +16,7 @@ pub fn Kapta(
     width: u32,
     height: u32,
     center: KaptaCoord,
+    #[prop(default = None)] feature_collection: Option<FeatureCollection>,
     #[prop(default = 0)] preload: u8,
 ) -> impl IntoView {
     let (loading, set_loading) = create_signal(true);
@@ -113,7 +115,7 @@ pub fn Kapta(
                     )
                 }
             >
-                <GeoJsonLayer />
+                <GeoJsonLayer feature_collection=feature_collection/>
                 <TileLayer view=view collection=collection />
 
             </div>

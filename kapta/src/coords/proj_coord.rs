@@ -68,7 +68,7 @@ impl ProjCoord {
         zoom: u8,
         width: u32,
         heigth: u32,
-        preload: u8
+        preload: u8,
     ) -> (ProjCoord, ProjCoord, ProjCoord) {
         let center_tile = self.to_tile(zoom);
 

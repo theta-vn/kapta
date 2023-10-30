@@ -1,15 +1,10 @@
-use geojson::FeatureCollection;
-use leptos::*;
-use leptos_kapta::{Kapta, KaptaCoord};
 use std::str::FromStr;
 
-fn main() {
-    wasm_logger::init(wasm_logger::Config::default());
-    mount_to_body(|| leptos::view! { <App/> })
-}
-
-#[component]
-pub fn App() -> impl IntoView {
+use geo_types::GeometryCollection;
+use geojson::{quick_collection, FeatureCollection, GeoJson};
+use kapta::utils;
+#[test]
+fn render() {
     let geojson_str = r#"
     {
         "type": "FeatureCollection",
@@ -219,19 +214,14 @@ pub fn App() -> impl IntoView {
     }
     "#;
 
-    let geo_feature = FeatureCollection::from_str(geojson_str).unwrap();
+    // let geo_feature = FeatureCollection::from_str(geojson_str).unwrap();
+    // dbg!("{:#?}", geo_feature);
 
-    // log::debug!("{:#?}", geo_feature);
-
-    let center: KaptaCoord = KaptaCoord::new(106.645, 10.788);
-
-    view! {
-        <div class="mx-auto">
-            <h1 class="text-center m-8 text-2xl ">Example with leptos</h1>
-            <div class="flex justify-center">
-                <Kapta zoom=3 width=900 height=700 center=center preload=1 feature_collection=Some(geo_feature)/>
-                // <Kapta zoom=3 width=900 height=700 center=center preload=1 />
-            </div>
-        </div>
-    }
+    // let mut collection: GeometryCollection<f64> = quick_collection(geo_feature).unwrap();
+    let geojson = geojson_str.parse::<GeoJson>().unwrap();
+    dbg!(&geojson);
+    // Turn the GeoJSON string into a geo_types GeometryCollection
+    let mut collection: GeometryCollection = quick_collection(&geojson).unwrap();
+    dbg!(&collection);
+    utils::geojson_to_geo();
 }
