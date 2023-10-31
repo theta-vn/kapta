@@ -22,7 +22,7 @@ pub fn App() -> impl IntoView {
                 },
                 "geometry": {
                     "type": "Point",
-                    "coordinates": [-112.0372, 46.608058]
+                    "coordinates": [106.645, 10.788]
                 }
             },
             {

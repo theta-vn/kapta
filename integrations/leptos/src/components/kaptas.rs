@@ -50,6 +50,7 @@ pub fn Kapta(
             let center_proj = ProjCoord::from(center);
             set_new_center.set(center_proj);
             set_loading.set(false);
+            
         }
 
         {
@@ -80,7 +81,7 @@ pub fn Kapta(
                 }
 
                 let kcollection = view.get().new_collection();
-                set_collection.set(kcollection);
+                set_collection.set(kcollection);                
             } else {
                 let (check, top_left, center, bottom_right, proj_3857_new) = view
                     .get()
@@ -102,7 +103,7 @@ pub fn Kapta(
             style:width=move || format!("{}px", width)
         >
             <Control zoom=zoom set_zoom=set_zoom/>
-
+            <GeoJsonLayer feature_collection=feature_collection zoom=zoom view=view />
             <div
                 node_ref=div_ref
                 id="kapta-base"
@@ -115,7 +116,7 @@ pub fn Kapta(
                     )
                 }
             >
-                <GeoJsonLayer feature_collection=feature_collection zoom=zoom />
+                
                 <TileLayer view=view collection=collection />
 
             </div>
