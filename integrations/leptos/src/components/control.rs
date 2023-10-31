@@ -9,7 +9,7 @@ enum ButtonZoom {
 #[component]
 pub fn Control(zoom: ReadSignal<u8>, set_zoom: WriteSignal<u8>) -> impl IntoView {
     view! {
-        <div id="kapta-control" style="position: absolute; z-index: 50; top: 0; right: 0;">
+        <div id="kapta-control" style="position: absolute; z-index: 100; top: 0; right: 0;">
             <BZoom kind=ButtonZoom::Inc zoom=zoom set_zoom=set_zoom/>
             <BZoom kind=ButtonZoom::Des zoom=zoom set_zoom=set_zoom/>
         </div>

@@ -103,9 +103,27 @@ pub fn Kapta(
             style:width=move || format!("{}px", width)
         >
             <Control zoom=zoom set_zoom=set_zoom/>
-            <GeoJsonLayer feature_collection=feature_collection zoom=zoom view=view />
             <div
                 node_ref=div_ref
+                id="kapta-proxy"
+                style="position: absolute; z-index: 90;"
+                style:height=move || format!("{}px", height)
+                style:width=move || format!("{}px", width)
+                style:transform=move || {
+                    format!(
+                        "translate3d({}px, {}px, 0px)",
+                        position.get().x - topleft.get().x,
+                        position.get().y - topleft.get().y,
+                    )
+                }
+            >
+                
+                
+
+            </div>
+            <GeoJsonLayer feature_collection=feature_collection zoom=zoom view=view />
+            <div
+                
                 id="kapta-base"
                 style="position: relative; z-index: 0;"
                 style:transform=move || {
