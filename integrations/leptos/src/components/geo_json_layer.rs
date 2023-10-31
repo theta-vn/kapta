@@ -12,7 +12,7 @@ pub fn GeoJsonLayer(
     #[prop(default = None)] feature_collection: Option<FeatureCollection>,
 ) -> impl IntoView {
     let (data, set_data) = create_signal(SeriesKG::default());
-    let (view_box, set_view_box) = create_signal(String::default());
+    let (view_box, set_view_box) = create_signal(String::from("0 0 0 0"));
     let (translate_svg, set_translate_svg) = create_signal(String::default());
     create_effect(move |_| {
         let center = point_to_pixel(
