@@ -106,17 +106,27 @@ pub fn Kapta(
                 node_ref=div_ref
                 id="kapta-proxy"
                 style="position: absolute; z-index: 90;"
+                style:transform=move || {
+                    format!(
+                        "translate3d({}px, {}px, 0px)",
+                        -topleft.get().x,
+                        -topleft.get().y,
+                    )
+                }
+            >
+                <div
+                
+                style="position: absolute; z-index: 90;"
                 style:height=move || format!("{}px", height)
                 style:width=move || format!("{}px", width)
                 style:transform=move || {
                     format!(
                         "translate3d({}px, {}px, 0px)",
-                        position.get().x - topleft.get().x,
-                        position.get().y - topleft.get().y,
+                        position.get().x + topleft.get().x,
+                        position.get().y + topleft.get().y,
                     )
                 }
-            >
-
+                ></div>
             </div>
             <GeoJsonLayer feature_collection=feature_collection zoom=zoom view=view />
             <div
