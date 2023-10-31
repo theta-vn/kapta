@@ -115,7 +115,7 @@ pub fn Kapta(
                     )
                 }
             >
-                <GeoJsonLayer feature_collection=feature_collection/>
+                <GeoJsonLayer feature_collection=feature_collection zoom=zoom />
                 <TileLayer view=view collection=collection />
 
             </div>

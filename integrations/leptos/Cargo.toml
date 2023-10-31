@@ -10,7 +10,7 @@ readme = "../../README.md"
 
 [dependencies]
 kapta = { path = "../../kapta" ,version = "0.0.3" }
-leptos = { version = "0.5", features = ["csr"] }
+leptos = { version = "0.5.2", features = ["csr"] }
 leptos-use = { version = "0.8" }
 geojson = "0.24.1"
 log = "0.4.6"

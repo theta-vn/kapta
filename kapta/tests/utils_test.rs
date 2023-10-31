@@ -1,8 +1,7 @@
-use std::str::FromStr;
+use std::{str::FromStr, collections::hash_map::DefaultHasher, hash::{Hash, Hasher}};
 
-use geo_types::{GeometryCollection, Coord};
-use geojson::{quick_collection, FeatureCollection, GeoJson};
-use kapta::{utils, coords::{KaptaGeo, KaptaPoint, KaptaCoord, KaptaPolygon}};
+use geojson::FeatureCollection;
+use kapta::{utils, coords::geojson_to_kaptageo};
 #[test]
 fn render() {
     let geojson_str = r#"
@@ -13,7 +12,7 @@ fn render() {
                 "type": "Feature",
                 "properties": {
                     "population": 200,
-                    "kapta": true
+                    "kapta": "marker"
                 },
                 "geometry": {
                     "type": "Point",
@@ -215,52 +214,15 @@ fn render() {
     "#;
 
     let geo_feature = FeatureCollection::from_str(geojson_str).unwrap();
-    // dbg!("{:#?}", geo_feature);
 
-    // // let mut collection: GeometryCollection<f64> = quick_collection(geo_feature).unwrap();
-    // let geojson = geojson_str.parse::<GeoJson>().unwrap();
-    // dbg!(&geojson);
-    // // Turn the GeoJSON string into a geo_types GeometryCollection
-    // let gc: GeometryCollection = quick_collection(&geojson).unwrap();
-    // dbg!(&gc);
-    // // let mut a = gc.iter().map(|geom| geom);
-    // // dbg!(a.next());
-    let mut array: Vec<KaptaGeo> = [].to_vec();
-    for (pos, geo_jf) in geo_feature.features.iter().enumerate() {
-      dbg!(pos);
-      dbg!(geo_jf);
-      let geo = geo_jf.clone();
-      let geo_value = geo.geometry.unwrap().value;
-      dbg!(&geo_value);
-      let geo_prop = geo.properties;
-      
-      match geo_value {
-        geojson::Value::Point(point) => {
-          let coord = KaptaCoord::new(point[0], point[1]).to_proj_coord();          
-          let kapta_point = KaptaPoint::new([coord.x, coord.y], geo_prop);
-          array.push(KaptaGeo::Point(kapta_point));
-        },
-        geojson::Value::MultiPoint(_) => todo!(),
-        geojson::Value::LineString(_) => todo!(),
-        geojson::Value::MultiLineString(_) => todo!(),
-        geojson::Value::Polygon(polygon) => {
-          // dbg!(polygon)
-          let mut value: Vec<Vec<Vec<f64>>> = [].to_vec();
-          for poly in polygon {
-            
-            let mut value_poly: Vec<Vec<f64>> = [].to_vec();
-            for point in poly {
-              let coord = KaptaCoord::new(point[0], point[1]).to_proj_coord();
-              value_poly.push([coord.x, coord.y].to_vec());
-            }
-            value.push(value_poly);
-          }
-          array.push(KaptaGeo::Polygon(KaptaPolygon::new(value, geo_prop)))
-        },
-        geojson::Value::MultiPolygon(_) => todo!(),
-        geojson::Value::GeometryCollection(_) => todo!(),
-      }
+    let array = geojson_to_kaptageo(geo_feature);
+    dbg!(&array);
+    for m in array {
+      let mut hasher = DefaultHasher::new();
+      m.hash(&mut hasher);
+      dbg!(hasher.finish());
+      // 1540136902312859152
+      // 14667932546091814007
     }
-    dbg!(array);
-    // utils::geojson_to_geo();
+
 }

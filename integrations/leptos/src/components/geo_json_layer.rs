@@ -1,13 +1,67 @@
-// use kapta::views::{KaptaView, SeriesPC};
 use geojson::FeatureCollection;
-use leptos::*;
+use kapta::coords::{geojson_to_kaptageo, SeriesKG};
+use leptos::{*, For};
+
+#[derive(Debug, Clone)]
+struct DatabaseEntry {
+    key: String,
+    value: i32,
+}
+
 #[component]
 pub fn GeoJsonLayer(
+    zoom: ReadSignal<u8>,
+    #[prop(default = None)] feature_collection: Option<FeatureCollection>,
+) -> impl IntoView {
+    let (data, set_data) = create_signal(SeriesKG::default());
+    create_effect(move |_| {
+        if let Some(collection) = &feature_collection {
+            let kapta_geo = geojson_to_kaptageo(collection.clone());
+            set_data.set(kapta_geo);
+        }
+    });
+   
+    view! {
+        <div id="kapta-layer-gjson">
+            <For
+                each=move || data.get()
+                key=|state| state.clone()
+                let:data
+            >
+                <p>{log::debug!("{:#?}", data)}</p>
+            </For>
+        </div>
+    }
+    // match feature_collection {
+    //     Some(collection) => {
+    //         let kapta_geo = geojson_to_kaptageo(collection);
+    //         log::debug!("{:#?}", &kapta_geo);
+    //         // let geo =
+    //         view! {
+    //             <div id="kapta-layer-gjson">
+    //                 // <For
+    //                 //     each=kapta_geo
+    //                 //     key=|state| state.clone()
+    //                 //     let:child
+    //                 // >
+    //                 //     <p></p>
+    //                 // </For>
+    //             </div>
+    //         }
+    //     }
+    //     None => view! {<div></div>},
+    // }
+}
+
+#[component]
+pub fn GeoPoint(
+    zoom: ReadSignal<u8>,
     #[prop(default = None)] feature_collection: Option<FeatureCollection>,
 ) -> impl IntoView {
     match feature_collection {
         Some(collection) => {
-            log::debug!("{:#?}", collection.features);
+            let kapta_geo = geojson_to_kaptageo(collection);
+            log::debug!("{:#?}", kapta_geo);
             // let geo =
             view! {
                 <div id="kapta-layer-gjson">

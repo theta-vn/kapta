@@ -38,6 +38,8 @@ impl ProjCoord {
         }
     }
 
+    
+
     pub fn similar(&self, other: ProjCoord) -> bool {
         self.coord.x as i64 == other.coord.x as i64 && self.coord.y as i64 == other.coord.y as i64
     }
@@ -104,4 +106,14 @@ pub fn size_tile(zoom: u8) -> (f64, f64) {
     let tile_width = (BOUND_LON_3857 * 2.).div(length_tile as f64);
     let tile_heigth = (BOUND_LAT_3857 * 2.).div(length_tile as f64);
     (tile_width, tile_heigth)
+}
+
+pub fn to_pixel(coord: Coord, zoom: u8) -> Coord {        
+    let length_tile = (2 as u64).pow(zoom.into());
+    let cx_tile = coord.x / length_tile as f64 / TILE as f64;
+    let cy_tile = coord.y / length_tile as f64 / TILE as f64;
+    Coord {
+        x: cx_tile,
+        y: cy_tile,
+    }
 }
