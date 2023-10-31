@@ -4,48 +4,96 @@ use kapta::{
     views::KaptaView,
 };
 use leptos::*;
+use leptos_use::core::Position;
 
 #[component]
 pub fn GeoJsonLayer(
     view: ReadSignal<KaptaView>,
     zoom: ReadSignal<u8>,
+    position: Signal<Position>,
+    is_dragging: Signal<bool>,
+
     #[prop(default = None)] feature_collection: Option<FeatureCollection>,
 ) -> impl IntoView {
+    let (loading, set_loading) = create_signal(true);
     let (data, set_data) = create_signal(SeriesKG::default());
     let (view_box, set_view_box) = create_signal(String::from("0 0 0 0"));
-    let (translate_svg, set_translate_svg) = create_signal(String::default());
+    let (translate_svg, set_translate_svg) = create_signal([0.; 2]);
+    let (center, set_center) = create_signal([0.; 2]);
+    let (new_center, set_new_center) = create_signal([0.; 2]);
     create_effect(move |_| {
-        let center = point_to_pixel(
-            [
-                view.get().center_p3857.coord.x,
-                view.get().center_p3857.coord.y,
-            ],
-            zoom.get(),
-        );
+        if loading.get() {
+            log::debug!("INIT::{:#?}", view.get());
+            let center_init = point_to_pixel(
+                [
+                    view.get().center_p3857.coord.x, // + (view.get().width as f64 / 2.),
+                    view.get().center_p3857.coord.y, // + (view.get().height as f64 / 2.),
+                ],
+                zoom.get(),
+            );
+            set_center.set(center_init);
+            set_new_center.set(center_init);
+            set_loading.set(false);
+            set_translate_svg.set(center_init);
+            if let Some(collection) = &feature_collection {
+                let kapta_geo = geojson_to_kaptageo(collection.clone());
+                set_data.set(kapta_geo);
+            }
 
-        if let Some(collection) = &feature_collection {
-            let kapta_geo = geojson_to_kaptageo(collection.clone());
-            set_data.set(kapta_geo);
+            let view_box = format!("0 0 {} {}", view.get().width, view.get().height);
+            set_view_box.set(view_box);
         }
-        let view_box = format!("0 0 {} {}", view.get().width, view.get().height);
-        set_view_box.set(view_box);
-        let translate_svg = format!(
-            "translate({},{})",
-            -center[0] + (view.get().width as f64 / 2.),
-            -center[1] + (view.get().height as f64 / 2.)
-        );
-        set_translate_svg.set(translate_svg);
+
+        {
+            // First || zoom || end drap ELSE drapping
+            if !is_dragging.get() && !loading.get() {
+                log::debug!("O DAu");
+
+                // Drap end
+                if position.get().x == 0. && position.get().y == 0. {
+                    set_center.set(new_center.get());
+                    set_translate_svg.set([
+                        new_center.get()[0] - (view.get().width as f64 / 2.),
+                        new_center.get()[1] - (view.get().height as f64 / 2.),
+                    ]);
+                    //     set_center.set(new_center.get());
+                    log::debug!("END DRAG:: {:#?}", 1);
+                    //     let translate_svg = format!(
+                    //         "translate({},{})",
+                    //         -center.get()[0] + (view.get().width as f64 / 2.) ,
+                    //         -center.get()[1] + (view.get().height as f64 / 2.)
+                    //     );
+                    //     set_translate_svg.set(translate_svg);
+                }
+            } else {
+                set_new_center.set([
+                    center.get()[0] - position.get().x,
+                    center.get()[1] - position.get().y,
+                ]);
+                log::debug!("DRAGGING:: {:#?}", new_center.get());
+                set_translate_svg.set([
+                    center.get()[0] - (view.get().width as f64 / 2.) - position.get().x,
+                    center.get()[1] - (view.get().height as f64 / 2.) - position.get().y,
+                ]);
+                // let translate_svg = format!(
+                //     "translate({},{})",
+                //     -center.get()[0] + (view.get().width as f64 / 2.) + position.get().x,
+                //     -center.get()[1] + (view.get().height as f64 / 2.) + position.get().y
+                // );
+                // set_translate_svg.set(translate_svg);
+            }
+        }
     });
 
     view! {
-        <div id="kapta-layer-gjson">
+        <div id="kapta-geojson">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox={move || view_box.get()}
                 style="position: absolute;top: 0px; left: 0px; z-index: 10; fill-opacity: 0"
             >
-                <g transform={move || translate_svg.get()}>
+                <g transform={move ||  format!("translate(-{},-{})", translate_svg.get()[0], translate_svg.get()[1])}>
                 <For
                     each=move || data.get()
-                    key=|state| state.clone()
+                    key=move |state| (state.clone(), zoom.get())
                     let:data
                 >
 
@@ -96,6 +144,7 @@ pub fn render_polygon(polygon: KaptaPolygon) -> impl IntoView {
 }
 
 pub fn point_to_pixel(slide: [f64; 2], zoom: u8) -> [f64; 2] {
+    // log::debug!("{:#?}",slide);
     let length_tile = (2 as u64).pow(zoom.into());
     [
         slide[0] / length_tile as f64 / 256.,

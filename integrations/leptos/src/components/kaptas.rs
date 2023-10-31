@@ -77,6 +77,7 @@ pub fn Kapta(
                     );
                     set_view.set(kview);
                     set_position.set(Position::default());
+                    // log::debug!("{:#?}", view.get());
                 }
 
                 let kcollection = view.get().new_collection();
@@ -128,7 +129,7 @@ pub fn Kapta(
                 }
                 ></div>
             </div>
-            <GeoJsonLayer feature_collection=feature_collection zoom=zoom view=view />
+            <GeoJsonLayer feature_collection=feature_collection zoom=zoom view=view position=position is_dragging=is_dragging />
             <div
 
                 id="kapta-base"
@@ -154,8 +155,9 @@ pub fn Kapta(
                     style:height="10px"
                     style:background="red"
                     style:border-radius="5px"
-                    ></div>
-                    <div
+                    >
+                </div>
+                <div
                     style:position="absolute"
                     style:bottom="0px"
                     >
