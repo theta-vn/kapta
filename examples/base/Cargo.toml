@@ -8,3 +8,4 @@ leptos_kapta = {path = "../../integrations/leptos"}
 leptos = {version = "0.5"}
 log = "0.4.6"
 wasm-logger = "0.2.0"
+geojson = "0.24.1"

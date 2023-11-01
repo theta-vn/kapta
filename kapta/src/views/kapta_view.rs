@@ -17,11 +17,20 @@ pub struct KaptaView {
     pub height: u32,
     pub pixel_x: f64,
     pub pixel_y: f64,
+    pub preload: u8,
 }
 
 impl KaptaView {
-    pub fn new(center_p3857: ProjCoord, origin: Coord, width: u32, height: u32, zoom: u8) -> Self {
-        let (top_left, center, bottom_right) = center_p3857.bound_rec_tile(zoom, width, height);
+    pub fn new(
+        center_p3857: ProjCoord,
+        origin: Coord,
+        width: u32,
+        height: u32,
+        zoom: u8,
+        preload: u8,
+    ) -> Self {
+        let (top_left, center, bottom_right) =
+            center_p3857.bound_rec_tile(zoom, width, height, preload);
         let length_hafl_tile = (2 as i64).pow((zoom - 1).into());
         let pixel_x = BOUND_LON_3857 / 256. / length_hafl_tile as f64;
         let pixel_y = BOUND_LAT_3857 / 256. / length_hafl_tile as f64;
@@ -36,6 +45,7 @@ impl KaptaView {
             bottom_right,
             pixel_x,
             pixel_y,
+            preload,
         }
     }
 
@@ -105,6 +115,7 @@ impl KaptaView {
         SeriesPC { series: collection }
     }
 
+    // TODO: Can toi uu lai
     pub fn drap_change_bound(
         &self,
         delta_pixel_x: f64,
@@ -118,7 +129,7 @@ impl KaptaView {
         );
 
         let (top_left, center, bottom_right) =
-            proj_3857_new.bound_rec_tile(self.zoom, self.width, self.height);
+            proj_3857_new.bound_rec_tile(self.zoom, self.width, self.height, self.preload);
 
         let check = (self.top_left.coord.x as i64) > (top_left.coord.x as i64)
             || (self.top_left.coord.y as i64) > (top_left.coord.y as i64)

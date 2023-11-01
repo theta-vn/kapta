@@ -10,8 +10,9 @@ fn render() {
     let center = KaptaCoord::new(107., 17.);
     let topleft: Coord = (80., 80.).into();
     let center_proj = ProjCoord::from(center);
+    let preload = 1;
 
-    let kview = KaptaView::new(center_proj, topleft, width, height, zoom);
+    let kview = KaptaView::new(center_proj, topleft, width, height, zoom, preload);
     dbg!(&kview);
     let kcollection = kview.new_collection();
     dbg!(&kcollection);
@@ -26,7 +27,7 @@ fn render() {
         kind: Proj::EPSG3857,
         distance2: 0.0,
     };
-    let view_new = KaptaView::new(center_p3857, topleft, width, height, zoom);
+    let view_new = KaptaView::new(center_p3857, topleft, width, height, zoom, preload);
     dbg!(&view_new);
 
     let col = view_new.new_collection();

@@ -1,15 +1,13 @@
+use std::{
+    collections::hash_map::DefaultHasher,
+    hash::{Hash, Hasher},
+    str::FromStr,
+};
+
 use geojson::FeatureCollection;
-use leptos::*;
-use leptos_kapta::{Kapta, KaptaCoord};
-use std::str::FromStr;
-
-fn main() {
-    wasm_logger::init(wasm_logger::Config::default());
-    mount_to_body(|| leptos::view! { <App/> })
-}
-
-#[component]
-pub fn App() -> impl IntoView {
+use kapta::coords::geojson_to_kaptageo;
+#[test]
+fn render() {
     let geojson_str = r#"
     {
         "type": "FeatureCollection",
@@ -18,11 +16,11 @@ pub fn App() -> impl IntoView {
                 "type": "Feature",
                 "properties": {
                     "population": 200,
-                    "show": "marker"
+                    "kapta": "marker"
                 },
                 "geometry": {
                     "type": "Point",
-                    "coordinates": [106.645, 10.788]
+                    "coordinates": [-112.0372, 46.608058]
                 }
             },
             {
@@ -221,17 +219,13 @@ pub fn App() -> impl IntoView {
 
     let geo_feature = FeatureCollection::from_str(geojson_str).unwrap();
 
-    // log::debug!("{:#?}", geo_feature);
-
-    let center: KaptaCoord = KaptaCoord::new(106.645, 17.);
-
-    view! {
-        <div class="mx-auto">
-            <h1 class="text-center m-8 text-2xl ">Example with leptos</h1>
-            <div class="flex justify-center">
-                <Kapta zoom=5 width=900 height=700 center=center preload=1 feature_collection=Some(geo_feature)/>
-                // <Kapta zoom=3 width=900 height=700 center=center preload=1 />
-            </div>
-        </div>
+    let array = geojson_to_kaptageo(geo_feature);
+    dbg!(&array);
+    for m in array {
+        let mut hasher = DefaultHasher::new();
+        m.hash(&mut hasher);
+        dbg!(hasher.finish());
+        // 1540136902312859152
+        // 14667932546091814007
     }
 }
