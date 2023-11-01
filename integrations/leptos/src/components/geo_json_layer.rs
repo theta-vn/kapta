@@ -1,7 +1,8 @@
 use geojson::FeatureCollection;
 use kapta::{
+    consts::{BOUND_LAT_3857, BOUND_LON_3857},
     coords::{geojson_to_kaptageo, KaptaGeo, KaptaPoint, KaptaPolygon},
-    views::KaptaView, consts::{BOUND_LON_3857, BOUND_LAT_3857},
+    views::KaptaView,
 };
 use leptos::*;
 use leptos_use::core::Position;
@@ -28,16 +29,11 @@ pub fn GeoJsonLayer(
             [].to_vec()
         }
     });
-  
-    
+
     create_effect(move |_| {
-        
         // Zoom || dragend
         if !loading.get() && !is_dragging.get() {
-            // zoom else dragend
-            
             if !draged.get() {
-                log::debug!("zoom");
                 let center_pixel = point_to_pixel(
                     [
                         view.get().center_p3857.coord.x,
@@ -70,7 +66,6 @@ pub fn GeoJsonLayer(
                 //     tmp_translate.get()[1] - tmp_position.get()[1],
                 // ]);
             }
-            
         }
 
         // First
@@ -87,7 +82,7 @@ pub fn GeoJsonLayer(
                 center_pixel[0] - (view.get().width as f64 / 2.),
                 center_pixel[1] - (view.get().height as f64 / 2.),
             ]);
-       
+
             set_loading.set(false);
             set_translate_svg.set(tmp_translate.get());
         }
@@ -98,7 +93,7 @@ pub fn GeoJsonLayer(
                 tmp_translate.get()[0] - position.get().x,
                 tmp_translate.get()[1] - position.get().y,
             ]);
-            
+
             if position.get().x == 0. && position.get().y == 0. {
                 set_draged.set(false)
             } else {
@@ -121,7 +116,7 @@ pub fn GeoJsonLayer(
                     {
                         match data {
                             KaptaGeo::Point(point)=> render_point(point, zoom).into_view(),
-                            KaptaGeo::Polygon(polygon) => render_polygon(polygon).into_view(),
+                            KaptaGeo::Polygon(polygon) => render_polygon(polygon, zoom).into_view(),
                         }
                     }
                 </For>
@@ -131,41 +126,37 @@ pub fn GeoJsonLayer(
     }
 }
 
-pub fn render_point(kp: KaptaPoint, zoom: ReadSignal<u8>) -> impl IntoView {
-    // log::debug!("{:#?}", kp.value);
-    let point = point_to_pixel(kp.value, zoom.get());
-    // log::debug!("{:#?}", point);
-    let d = format!("M {} {} l -7 -20 h 14 Z", point[0], point[1]);
+pub fn render_point(kp: KaptaPoint, zoom: ReadSignal<u8>) -> impl IntoView {    
+    let point = point_to_pixel(kp.value, zoom.get());   
+    let d = format!("M{},{} l-9,-25 l5,-5 h8 l5,5Z", point[0], point[1]);
     view! {
         <g>
-            // <path
-            //     fill="#ff0000"
-            //     fill-rule="evenodd"
-            //     d="M11.291 21.706 12 21l-.709.706zM12 21l.708.706a1 1 0 0 1-1.417 0l-.006-.007-.017-.017-.062-.063a47.708 47.708 0 0 1-1.04-1.106 49.562 49.562 0 0 1-2.456-2.908c-.892-1.15-1.804-2.45-2.497-3.734C4.535 12.612 4 11.248 4 10c0-4.539 3.592-8 8-8 4.408 0 8 3.461 8 8 0 1.248-.535 2.612-1.213 3.87-.693 1.286-1.604 2.585-2.497 3.735a49.583 49.583 0 0 1-3.496 4.014l-.062.063-.017.017-.006.006L12 21zm0-8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"
-            //     clip-rule="evenodd"
-            // />
             <path d=d  stroke="red" fill="#ff0000"/>
         </g>
     }
 }
 
-pub fn render_polygon(polygon: KaptaPolygon) -> impl IntoView {
-    // log::debug!("{:#?}", polygon);
+pub fn render_polygon(polygon: KaptaPolygon, zoom: ReadSignal<u8>) -> impl IntoView {    
+    let hull = &polygon.value[0];    
+    let mut d = "M".to_string();
+    for p in hull {
+        let point = point_to_pixel(*p, zoom.get());
+        
+        let v = format!(" {},{} ", point[0], point[1]);
+        d.push_str(&v);
+    }
+    d.push_str("Z");
     view! {
         <g>
+            <path d=d  stroke="red" fill="none" />
         </g>
     }
 }
 
-pub fn point_to_pixel(slide: [f64; 2], zoom: u8) -> [f64; 2] {
-    // log::debug!("{:#?}",slide);
-    let length_tile = (2 as u64).pow(zoom.into());
-    // [
-    //     slide[0] * 256. * length_tile as f64 / (BOUND_LON_3857 * 2.), // 256.,
-    //     slide[1] * 256. * length_tile as f64 / (BOUND_LAT_3857 * 2.)
-    // ]
+pub fn point_to_pixel(slide: [f64; 2], zoom: u8) -> [f64; 2] {    
+    let length_tile = (2 as u64).pow(zoom.into());    
     [
-        slide[0] * 128. * length_tile as f64 / (BOUND_LON_3857 ), // 256.,
-        slide[1] * 128. * length_tile as f64 / (BOUND_LAT_3857 )
+        slide[0] * 128. * length_tile as f64 / (BOUND_LON_3857),
+        slide[1] * 128. * length_tile as f64 / (BOUND_LAT_3857),
     ]
 }

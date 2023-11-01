@@ -22,7 +22,7 @@ pub fn App() -> impl IntoView {
                 },
                 "geometry": {
                     "type": "Point",
-                    "coordinates": [10, 10]
+                    "coordinates": [106.645, 10.788]
                 }
             },
             {
@@ -223,15 +223,13 @@ pub fn App() -> impl IntoView {
 
     // log::debug!("{:#?}", geo_feature);
 
-    // let center: KaptaCoord = KaptaCoord::new(106.5, 10.788);
-    // let center: KaptaCoord = KaptaCoord::new(105., 17.);
-    let center: KaptaCoord = KaptaCoord::new(0., 0.);
+    let center: KaptaCoord = KaptaCoord::new(106.645, 17.);
 
     view! {
         <div class="mx-auto">
             <h1 class="text-center m-8 text-2xl ">Example with leptos</h1>
             <div class="flex justify-center">
-                <Kapta zoom=3 width=900 height=700 center=center preload=1 feature_collection=Some(geo_feature)/>
+                <Kapta zoom=5 width=900 height=700 center=center preload=1 feature_collection=Some(geo_feature)/>
                 // <Kapta zoom=3 width=900 height=700 center=center preload=1 />
             </div>
         </div>

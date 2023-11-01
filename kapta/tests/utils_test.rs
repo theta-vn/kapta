@@ -1,7 +1,11 @@
-use std::{str::FromStr, collections::hash_map::DefaultHasher, hash::{Hash, Hasher}};
+use std::{
+    collections::hash_map::DefaultHasher,
+    hash::{Hash, Hasher},
+    str::FromStr,
+};
 
 use geojson::FeatureCollection;
-use kapta::{utils, coords::geojson_to_kaptageo};
+use kapta::coords::geojson_to_kaptageo;
 #[test]
 fn render() {
     let geojson_str = r#"
@@ -218,11 +222,10 @@ fn render() {
     let array = geojson_to_kaptageo(geo_feature);
     dbg!(&array);
     for m in array {
-      let mut hasher = DefaultHasher::new();
-      m.hash(&mut hasher);
-      dbg!(hasher.finish());
-      // 1540136902312859152
-      // 14667932546091814007
+        let mut hasher = DefaultHasher::new();
+        m.hash(&mut hasher);
+        dbg!(hasher.finish());
+        // 1540136902312859152
+        // 14667932546091814007
     }
-
 }
