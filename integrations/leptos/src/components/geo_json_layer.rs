@@ -104,57 +104,61 @@ pub fn GeoJsonLayer(
 
     view! {
         <div id="kapta-geojson">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox={move || format!("0 0 {} {}", view.get().width ,view.get().height)}
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox=move || format!("0 0 {} {}", view.get().width, view.get().height)
                 style="position: absolute;top: 0px; left: 0px; z-index: 10;"
             >
-                <g transform={move ||  format!("translate({},{})", -translate_svg.get()[0], -translate_svg.get()[1])}>
-                <For
-                    each=move || memo_data.get()
-                    key=move |state| (state.clone(), zoom.get())
-                    let:data
-                >
-                    {
-                        match data {
-                            KaptaGeo::Point(point)=> render_point(point, zoom).into_view(),
+                <g transform=move || {
+                    format!("translate({},{})", -translate_svg.get()[0], -translate_svg.get()[1])
+                }>
+                    <For
+                        each=move || memo_data.get()
+                        key=move |state| (state.clone(), zoom.get())
+                        let:data
+                    >
+
+                        {match data {
+                            KaptaGeo::Point(point) => render_point(point, zoom).into_view(),
                             KaptaGeo::Polygon(polygon) => render_polygon(polygon, zoom).into_view(),
-                        }
-                    }
-                </For>
+                        }}
+
+                    </For>
                 </g>
             </svg>
         </div>
     }
 }
 
-pub fn render_point(kp: KaptaPoint, zoom: ReadSignal<u8>) -> impl IntoView {    
-    let point = point_to_pixel(kp.value, zoom.get());   
+pub fn render_point(kp: KaptaPoint, zoom: ReadSignal<u8>) -> impl IntoView {
+    let point = point_to_pixel(kp.value, zoom.get());
     let d = format!("M{},{} l-9,-25 l5,-5 h8 l5,5Z", point[0], point[1]);
     view! {
         <g>
-            <path d=d  stroke="red" fill="#ff0000"/>
+            <path d=d stroke="red" fill="#ff0000"></path>
         </g>
     }
 }
 
-pub fn render_polygon(polygon: KaptaPolygon, zoom: ReadSignal<u8>) -> impl IntoView {    
-    let hull = &polygon.value[0];    
+pub fn render_polygon(polygon: KaptaPolygon, zoom: ReadSignal<u8>) -> impl IntoView {
+    let hull = &polygon.value[0];
     let mut d = "M".to_string();
     for p in hull {
         let point = point_to_pixel(*p, zoom.get());
-        
+
         let v = format!(" {},{} ", point[0], point[1]);
         d.push_str(&v);
     }
     d.push_str("Z");
     view! {
         <g>
-            <path d=d  stroke="red" fill="none" />
+            <path d=d stroke="red" fill="none"></path>
         </g>
     }
 }
 
-pub fn point_to_pixel(slide: [f64; 2], zoom: u8) -> [f64; 2] {    
-    let length_tile = (2 as u64).pow(zoom.into());    
+pub fn point_to_pixel(slide: [f64; 2], zoom: u8) -> [f64; 2] {
+    let length_tile = (2 as u64).pow(zoom.into());
     [
         slide[0] * 128. * length_tile as f64 / (BOUND_LON_3857),
         slide[1] * 128. * length_tile as f64 / (BOUND_LAT_3857),

@@ -38,8 +38,6 @@ impl ProjCoord {
         }
     }
 
-    
-
     pub fn similar(&self, other: ProjCoord) -> bool {
         self.coord.x as i64 == other.coord.x as i64 && self.coord.y as i64 == other.coord.y as i64
     }
@@ -76,8 +74,8 @@ impl ProjCoord {
 
         // let dx = (width / 2 - 1) as f64 / TILE as f64;
         // let dy = (heigth / 2 - 1) as f64 / TILE as f64;
-        let dx = (width / 2 ) as f64 / TILE as f64;
-        let dy = (heigth / 2 ) as f64 / TILE as f64;
+        let dx = (width / 2) as f64 / TILE as f64;
+        let dy = (heigth / 2) as f64 / TILE as f64;
 
         let tl_tile = Coord {
             x: center_tile.coord.x - dx - preload as f64,
@@ -110,7 +108,7 @@ pub fn size_tile(zoom: u8) -> (f64, f64) {
     (tile_width, tile_heigth)
 }
 
-// pub fn to_pixel_estimate(coord: Coord, zoom: u8) -> Coord {        
+// pub fn to_pixel_estimate(coord: Coord, zoom: u8) -> Coord {
 //     let length_tile = (2 as u64).pow(zoom.into());
 //     let cx_tile = coord.x / length_tile as f64 / TILE as f64;
 //     let cy_tile = coord.y / length_tile as f64 / TILE as f64;
@@ -120,7 +118,7 @@ pub fn size_tile(zoom: u8) -> (f64, f64) {
 //     }
 // }
 
-// pub fn value_point_to_pixel(slide: [f64; 2], zoom: u8) -> [f64; 2] {        
+// pub fn value_point_to_pixel(slide: [f64; 2], zoom: u8) -> [f64; 2] {
 //     let length_tile = (2 as u64).pow(zoom.into());
 //     // let cx_tile = coord.x / length_tile as f64 / TILE as f64;
 //     // let cy_tile = coord.y / length_tile as f64 / TILE as f64;

@@ -229,8 +229,15 @@ pub fn App() -> impl IntoView {
         <div class="mx-auto">
             <h1 class="text-center m-8 text-2xl ">Example with leptos</h1>
             <div class="flex justify-center">
-                <Kapta zoom=5 width=900 height=700 center=center preload=1 feature_collection=Some(geo_feature)/>
-                // <Kapta zoom=3 width=900 height=700 center=center preload=1 />
+                <Kapta
+                    zoom=5
+                    width=900
+                    height=700
+                    center=center
+                    preload=1
+                    feature_collection=Some(geo_feature)
+                />
+            // <Kapta zoom=3 width=900 height=700 center=center preload=1 />
             </div>
         </div>
     }
