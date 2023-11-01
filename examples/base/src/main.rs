@@ -22,7 +22,7 @@ pub fn App() -> impl IntoView {
                 },
                 "geometry": {
                     "type": "Point",
-                    "coordinates": [106.645, 10.788]
+                    "coordinates": [10, 10]
                 }
             },
             {
@@ -223,7 +223,9 @@ pub fn App() -> impl IntoView {
 
     // log::debug!("{:#?}", geo_feature);
 
-    let center: KaptaCoord = KaptaCoord::new(106.645, 10.788);
+    // let center: KaptaCoord = KaptaCoord::new(106.5, 10.788);
+    // let center: KaptaCoord = KaptaCoord::new(105., 17.);
+    let center: KaptaCoord = KaptaCoord::new(0., 0.);
 
     view! {
         <div class="mx-auto">
