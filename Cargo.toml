@@ -10,6 +10,3 @@ exclude = ["benchmarks", "examples"]
 
 [workspace.package]
 version = "0.0.3"
-
-[workspace.dependencies]
-kapta = { path = "./kapta" }
