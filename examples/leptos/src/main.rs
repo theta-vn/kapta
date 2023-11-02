@@ -234,7 +234,7 @@ pub fn App() -> impl IntoView {
                     width=900
                     height=700
                     center=center
-                    preload=1
+                    preload=0
                     feature_collection=Some(geo_feature)
                 />
             // <Kapta zoom=3 width=900 height=700 center=center preload=1 />

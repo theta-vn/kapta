@@ -35,6 +35,16 @@ impl KaptaPoint {
         Self { value, properties }
     }
 }
+
+impl From<[f64; 2]> for KaptaPoint {
+    fn from(value: [f64; 2]) -> Self {
+        Self {
+            value,
+            properties: None,
+        }
+    }
+}
+
 impl Eq for KaptaPoint {}
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct KaptaPolygon {

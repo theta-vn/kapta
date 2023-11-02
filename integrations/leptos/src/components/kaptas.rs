@@ -150,39 +150,68 @@ pub fn Kapta(
                 <TileLayer view=view collection=collection/>
 
             </div>
-        <div id="kapta-debug">
-        <div
-        style:position="absolute"
-        style:top="345px"
-        style:left="445px"
-        style:width="10px"
-        style:height="10px"
-        style:background="red"
-        style:border-radius="5px"
-        >
-        </div>
-        <div
-        style:position="absolute"
-        style:bottom="0px"
-        >
-        <p>X: {move || position.get().x}</p>
-        <p>Y: {move || position.get().y}</p>
-        <p>Z: {move || zoom.get()}</p>
-        <p>Center: {move || format!("{:.2}:{:.2}", new_center.get().coord.x,  new_center.get().coord.y)}</p>
-        </div>
+            <div id="kapta-debug">
+                <div
+                    style:position="absolute"
+                    style:top="345px"
+                    style:left="445px"
+                    style:width="10px"
+                    style:height="10px"
+                    style:background="red"
+                    style:border-radius="5px"
+                ></div>
+                <div style:position="absolute" style:bottom="0px">
+                    <p>X: {move || position.get().x}</p>
+                    <p>Y: {move || position.get().y}</p>
+                    <p>Z: {move || zoom.get()}</p>
+                    <p>
+                        Center:
+                        {move || {
+                            format!(
+                                "{:.2}:{:.2}",
+                                new_center.get().coord.x,
+                                new_center.get().coord.y,
+                            )
+                        }}
+                    </p>
+                </div>
 
-        <div
-        style:position="absolute"
-        style:bottom="0px"
-        style:right="0px"
-        >
-        <p>Center: {move || format!("{:.2}#{:.2}",view.get().center.coord.x, view.get().center.coord.y)}</p>
-        <p>TopLeft: {move || format!("{:.2}#{:.2} {:#}",view.get().top_left.coord.x, view.get().top_left.coord.y, view.get().top_left.coord.y.floor())}</p>
-        <p>BotomRight: {move || format!("{:.2}#{:.2}",view.get().bottom_right.coord.x, view.get().bottom_right.coord.y)}</p>
-        <p>is_dragging: {move || is_dragging.get()}</p>
-        <p>loading: {move || loading.get()}</p>
-        </div>
-        </div>
+                <div style:position="absolute" style:bottom="0px" style:right="0px">
+                    <p>
+                        Center:
+                        {move || {
+                            format!(
+                                "{:.2}#{:.2}",
+                                view.get().center.coord.x,
+                                view.get().center.coord.y,
+                            )
+                        }}
+                    </p>
+                    <p>
+                        TopLeft:
+                        {move || {
+                            format!(
+                                "{:.2}#{:.2} {:#}",
+                                view.get().top_left.coord.x,
+                                view.get().top_left.coord.y,
+                                view.get().top_left.coord.y.floor(),
+                            )
+                        }}
+                    </p>
+                    <p>
+                        BotomRight:
+                        {move || {
+                            format!(
+                                "{:.2}#{:.2}",
+                                view.get().bottom_right.coord.x,
+                                view.get().bottom_right.coord.y,
+                            )
+                        }}
+                    </p>
+                    <p>is_dragging: {move || is_dragging.get()}</p>
+                    <p>loading: {move || loading.get()}</p>
+                </div>
+            </div>
         </div>
     }
 }

@@ -17,11 +17,8 @@ pub fn GeoJsonLayer(
     #[prop(default = None)] feature_collection: Option<FeatureCollection>,
 ) -> impl IntoView {
     let (loading, set_loading) = create_signal(true);
-    let (draged, set_draged) = create_signal(false);
     let (translate_svg, set_translate_svg) = create_signal([0.; 2]);
-    let (translate, set_translate) = create_signal([0.; 2]);
-    // let (tmp_position, set_tmp_position) = create_signal([0.; 2]);
-
+    let (translate, set_translate) = create_signal(KaptaPoint::default());
     let memo_data = create_memo(move |_| {
         if let Some(collection) = &feature_collection {
             geojson_to_kaptageo(collection.clone())
@@ -33,38 +30,20 @@ pub fn GeoJsonLayer(
     create_effect(move |_| {
         // Zoom || dragend
         if !loading.get() && !is_dragging.get() {
-            // Dragend
-            if !draged.get() {
-                let center_pixel = point_to_pixel(
-                    [
-                        view.get().center_p3857.coord.x,
-                        view.get().center_p3857.coord.y,
-                    ],
-                    zoom.get(),
-                );
+            let center_pixel = point_to_pixel(
+                [
+                    view.get().center_p3857.coord.x,
+                    view.get().center_p3857.coord.y,
+                ],
+                zoom.get(),
+            );
 
-                set_translate.set([
-                    center_pixel[0] - (view.get().width as f64 / 2.),
-                    center_pixel[1] - (view.get().height as f64 / 2.),
-                ]);
-                set_loading.set(false);
-                set_translate_svg.set(translate.get());
-            } 
-            // Zoom
-            else {
-                let center_pixel = point_to_pixel(
-                    [
-                        view.get().center_p3857.coord.x,
-                        view.get().center_p3857.coord.y,
-                    ],
-                    zoom.get(),
-                );
-                set_draged.set(false);
-                set_translate.set([
-                    center_pixel[0] - (view.get().width as f64 / 2.),
-                    center_pixel[1] - (view.get().height as f64 / 2.),
-                ]);            
-            }
+            set_translate.set(KaptaPoint::from([
+                center_pixel[0] - (view.get().width as f64 / 2.),
+                center_pixel[1] - (view.get().height as f64 / 2.),
+            ]));
+            set_loading.set(false);
+            set_translate_svg.set([0., 0.]);
         }
 
         // First
@@ -77,27 +56,17 @@ pub fn GeoJsonLayer(
                 zoom.get(),
             );
 
-            set_translate.set([
+            set_translate.set(KaptaPoint::from([
                 center_pixel[0] - (view.get().width as f64 / 2.),
                 center_pixel[1] - (view.get().height as f64 / 2.),
-            ]);
+            ]));
 
             set_loading.set(false);
-            set_translate_svg.set(translate.get());
+            set_translate_svg.set([0., 0.]);
         }
         // When dragging
         if is_dragging.get() {
-            // log::debug!("EFFECT DRAGGING tmp_translate::{:#?}", tmp_translate.get());
-            set_translate_svg.set([
-                translate.get()[0] - position.get().x,
-                translate.get()[1] - position.get().y,
-            ]);
-
-            if position.get().x == 0. && position.get().y == 0. {
-                set_draged.set(false)
-            } else {
-                set_draged.set(true)
-            }
+            set_translate_svg.set([-position.get().x, -position.get().y]);
         }
     });
 
@@ -113,13 +82,17 @@ pub fn GeoJsonLayer(
                 }>
                     <For
                         each=move || memo_data.get()
-                        key=move |state| (state.clone(), zoom.get())
+                        key=move |state| (state.clone(), zoom.get(), translate.get())
                         let:data
                     >
 
                         {match data {
-                            KaptaGeo::Point(point) => render_point(point, zoom).into_view(),
-                            KaptaGeo::Polygon(polygon) => render_polygon(polygon, zoom).into_view(),
+                            KaptaGeo::Point(point) => {
+                                render_point(point, zoom, translate).into_view()
+                            }
+                            KaptaGeo::Polygon(polygon) => {
+                                render_polygon(polygon, zoom, translate).into_view()
+                            }
                         }}
 
                     </For>
@@ -129,8 +102,16 @@ pub fn GeoJsonLayer(
     }
 }
 
-pub fn render_point(kp: KaptaPoint, zoom: ReadSignal<u8>) -> impl IntoView {
-    let point = point_to_pixel(kp.value, zoom.get());
+pub fn render_point(
+    point: KaptaPoint,
+    zoom: ReadSignal<u8>,
+    translate: ReadSignal<KaptaPoint>,
+) -> impl IntoView {
+    let point = point_sub(
+        point_to_pixel(point.value, zoom.get_untracked()),
+        translate.get_untracked().value,
+    );
+
     let d = format!("M{},{} l-9,-25 l5,-5 h8 l5,5Z", point[0], point[1]);
     view! {
         <g>
@@ -139,11 +120,15 @@ pub fn render_point(kp: KaptaPoint, zoom: ReadSignal<u8>) -> impl IntoView {
     }
 }
 
-pub fn render_polygon(polygon: KaptaPolygon, zoom: ReadSignal<u8>) -> impl IntoView {
+pub fn render_polygon(
+    polygon: KaptaPolygon,
+    zoom: ReadSignal<u8>,
+    translate: ReadSignal<KaptaPoint>,
+) -> impl IntoView {
     let hull = &polygon.value[0];
     let mut d = "M".to_string();
     for p in hull {
-        let point = point_to_pixel(*p, zoom.get());
+        let point = point_sub(point_to_pixel(*p, zoom.get()), translate.get().value);
 
         let v = format!(" {},{} ", point[0], point[1]);
         d.push_str(&v);
@@ -162,4 +147,8 @@ pub fn point_to_pixel(slide: [f64; 2], zoom: u8) -> [f64; 2] {
         slide[0] * 128. * length_tile as f64 / (BOUND_LON_3857),
         slide[1] * 128. * length_tile as f64 / (BOUND_LAT_3857),
     ]
+}
+
+pub fn point_sub(slide: [f64; 2], other: [f64; 2]) -> [f64; 2] {
+    [slide[0] - other[0], slide[1] - other[1]]
 }
