@@ -19,7 +19,7 @@ pub fn GeoJsonLayer(
     let (loading, set_loading) = create_signal(true);
     let (draged, set_draged) = create_signal(false);
     let (translate_svg, set_translate_svg) = create_signal([0.; 2]);
-    let (tmp_translate, set_tmp_translate) = create_signal([0.; 2]);
+    let (translate, set_translate) = create_signal([0.; 2]);
     // let (tmp_position, set_tmp_position) = create_signal([0.; 2]);
 
     let memo_data = create_memo(move |_| {
@@ -33,6 +33,7 @@ pub fn GeoJsonLayer(
     create_effect(move |_| {
         // Zoom || dragend
         if !loading.get() && !is_dragging.get() {
+            // Dragend
             if !draged.get() {
                 let center_pixel = point_to_pixel(
                     [
@@ -42,13 +43,15 @@ pub fn GeoJsonLayer(
                     zoom.get(),
                 );
 
-                set_tmp_translate.set([
+                set_translate.set([
                     center_pixel[0] - (view.get().width as f64 / 2.),
                     center_pixel[1] - (view.get().height as f64 / 2.),
                 ]);
                 set_loading.set(false);
-                set_translate_svg.set(tmp_translate.get());
-            } else {
+                set_translate_svg.set(translate.get());
+            } 
+            // Zoom
+            else {
                 let center_pixel = point_to_pixel(
                     [
                         view.get().center_p3857.coord.x,
@@ -57,14 +60,10 @@ pub fn GeoJsonLayer(
                     zoom.get(),
                 );
                 set_draged.set(false);
-                set_tmp_translate.set([
+                set_translate.set([
                     center_pixel[0] - (view.get().width as f64 / 2.),
                     center_pixel[1] - (view.get().height as f64 / 2.),
-                ]);
-                // set_tmp_translate.set([
-                //     tmp_translate.get()[0] - tmp_position.get()[0],
-                //     tmp_translate.get()[1] - tmp_position.get()[1],
-                // ]);
+                ]);            
             }
         }
 
@@ -78,20 +77,20 @@ pub fn GeoJsonLayer(
                 zoom.get(),
             );
 
-            set_tmp_translate.set([
+            set_translate.set([
                 center_pixel[0] - (view.get().width as f64 / 2.),
                 center_pixel[1] - (view.get().height as f64 / 2.),
             ]);
 
             set_loading.set(false);
-            set_translate_svg.set(tmp_translate.get());
+            set_translate_svg.set(translate.get());
         }
         // When dragging
         if is_dragging.get() {
             // log::debug!("EFFECT DRAGGING tmp_translate::{:#?}", tmp_translate.get());
             set_translate_svg.set([
-                tmp_translate.get()[0] - position.get().x,
-                tmp_translate.get()[1] - position.get().y,
+                translate.get()[0] - position.get().x,
+                translate.get()[1] - position.get().y,
             ]);
 
             if position.get().x == 0. && position.get().y == 0. {
