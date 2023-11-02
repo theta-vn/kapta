@@ -1,10 +1,10 @@
 use geojson::FeatureCollection;
 use kapta::{
     consts::{BOUND_LAT_3857, BOUND_LON_3857},
-    coords::{geojson_to_kaptageo, KaptaGeo, KaptaPoint, KaptaPolygon, KaptaLineString},
+    coords::{geojson_to_kaptageo, KaptaGeo, KaptaLineString, KaptaPoint, KaptaPolygon},
     views::KaptaView,
 };
-use leptos::*;
+use leptos::{svg::G, *};
 use leptos_use::core::Position;
 
 #[component]
@@ -17,7 +17,9 @@ pub fn GeoJsonLayer(
     #[prop(default = None)] feature_collection: Option<FeatureCollection>,
 ) -> impl IntoView {
     let (loading, set_loading) = create_signal(true);
+    let (draped, set_draped) = create_signal(false);
     let (translate_svg, set_translate_svg) = create_signal([0.; 2]);
+    let (tmp_translate, set_tmp_translate) = create_signal([0.; 2]);
     let (translate, set_translate) = create_signal(KaptaPoint::default());
     let memo_data = create_memo(move |_| {
         if let Some(collection) = &feature_collection {
@@ -26,24 +28,38 @@ pub fn GeoJsonLayer(
             [].to_vec()
         }
     });
+    let svg_ref = create_node_ref::<G>();
 
     create_effect(move |_| {
         // Zoom || dragend
+        zoom.get();
         if !loading.get() && !is_dragging.get() {
-            let center_pixel = point_to_pixel(
-                [
-                    view.get().center_p3857.coord.x,
-                    view.get().center_p3857.coord.y,
-                ],
-                zoom.get(),
-            );
+            if draped.get() {
+                let bound = svg_ref.get().unwrap();
+                let data_x = bound.get_attribute("data-x").unwrap();
+                let data_y = bound.get_attribute("data-y").unwrap();
 
-            set_translate.set(KaptaPoint::from([
-                center_pixel[0] - (view.get().width as f64 / 2.),
-                center_pixel[1] - (view.get().height as f64 / 2.),
-            ]));
-            set_loading.set(false);
-            set_translate_svg.set([0., 0.]);
+                let x = data_x.parse::<f64>().unwrap();
+                let y = data_y.parse::<f64>().unwrap();
+                set_tmp_translate.set([x, y]);
+                set_draped.set(false);
+            } else {
+                let center_pixel = point_to_pixel(
+                    [
+                        view.get().center_p3857.coord.x,
+                        view.get().center_p3857.coord.y,
+                    ],
+                    zoom.get(),
+                );
+
+                set_translate.set(KaptaPoint::from([
+                    center_pixel[0] - (view.get().width as f64 / 2.),
+                    center_pixel[1] - (view.get().height as f64 / 2.),
+                ]));
+                // set_loading.set(true);
+                set_translate_svg.set([0., 0.]);
+                set_tmp_translate.set([0., 0.]);
+            }
         }
 
         // First
@@ -63,10 +79,19 @@ pub fn GeoJsonLayer(
 
             set_loading.set(false);
             set_translate_svg.set([0., 0.]);
+            set_tmp_translate.set([0., 0.]);
         }
         // When dragging
         if is_dragging.get() {
-            set_translate_svg.set([-position.get().x, -position.get().y]);
+            set_translate_svg.set([
+                -(position.get().x + tmp_translate.get()[0]),
+                -(position.get().y + tmp_translate.get()[1]),
+            ]);
+            if position.get().x == 0. && position.get().y == 0. {
+                set_draped.set(false);
+            } else {
+                set_draped.set(true);
+            }
         }
     });
 
@@ -79,9 +104,19 @@ pub fn GeoJsonLayer(
                 style:height=move || format!("{}px", view.get().height)
                 style:width=move || format!("{}px", view.get().width)
             >
-                <g transform=move || {
-                    format!("translate({},{})", -translate_svg.get()[0], -translate_svg.get()[1])
-                }>
+                <g
+                    id="kapta_svg"
+                    node_ref=svg_ref
+                    data-x=move || -translate_svg.get()[0]
+                    data-y=move || -translate_svg.get()[1]
+                    transform=move || {
+                        format!(
+                            "translate({},{})",
+                            -translate_svg.get()[0],
+                            -translate_svg.get()[1],
+                        )
+                    }
+                >
                     <For
                         each=move || memo_data.get()
                         key=move |state| (state.clone(), zoom.get(), translate.get())
@@ -97,6 +132,20 @@ pub fn GeoJsonLayer(
                             }
                             KaptaGeo::LineString(line_string) => {
                                 render_line_string(line_string, zoom, translate).into_view()
+                            }
+                            KaptaGeo::MultiLineString(multi_line_string) => {
+                                (multi_line_string
+                                    .into_iter()
+                                    .map(|n| render_line_string(n, zoom, translate).into_view())
+                                    .collect::<Vec<_>>())
+                                    .into_view()
+                            }
+                            KaptaGeo::MultiPolygon(multi_polygon) => {
+                                (multi_polygon
+                                    .into_iter()
+                                    .map(|n| render_polygon(n, zoom, translate).into_view())
+                                    .collect::<Vec<_>>())
+                                    .into_view()
                             }
                         }}
 
@@ -120,7 +169,7 @@ pub fn render_point(
     let d = format!("M{},{} l-9,-25 l5,-5 h8 l5,5Z", point[0], point[1]);
     view! {
         <g>
-            <path d=d stroke="red" fill="#ff0000"></path>
+            <path d=d stroke="red" fill="none"></path>
         </g>
     }
 }
@@ -141,11 +190,10 @@ pub fn render_polygon(
     d.push_str("Z");
     view! {
         <g>
-            <path d=d stroke="red" fill="none"></path>
+            <path d=d stroke="blue" fill="none"></path>
         </g>
     }
 }
-
 
 pub fn render_line_string(
     line_string: KaptaLineString,

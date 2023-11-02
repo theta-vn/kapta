@@ -173,6 +173,7 @@ pub fn Kapta(
                                 new_center.get().coord.y,
                             )
                         }}
+
                     </p>
                 </div>
 
@@ -186,6 +187,7 @@ pub fn Kapta(
                                 view.get().center.coord.y,
                             )
                         }}
+
                     </p>
                     <p>
                         TopLeft:
@@ -197,6 +199,7 @@ pub fn Kapta(
                                 view.get().top_left.coord.y.floor(),
                             )
                         }}
+
                     </p>
                     <p>
                         BotomRight:
@@ -207,6 +210,7 @@ pub fn Kapta(
                                 view.get().bottom_right.coord.y,
                             )
                         }}
+
                     </p>
                     <p>is_dragging: {move || is_dragging.get()}</p>
                     <p>loading: {move || loading.get()}</p>
