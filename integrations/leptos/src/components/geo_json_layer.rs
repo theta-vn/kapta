@@ -117,6 +117,7 @@ pub fn GeoJsonLayer(
                         )
                     }
                 >
+
                     <For
                         each=move || memo_data.get()
                         key=move |state| (state.clone(), zoom.get(), translate.get())
