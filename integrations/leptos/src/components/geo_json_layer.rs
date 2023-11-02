@@ -76,6 +76,8 @@ pub fn GeoJsonLayer(
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox=move || format!("0 0 {} {}", view.get().width, view.get().height)
                 style="position: absolute;top: 0px; left: 0px; z-index: 10;"
+                style:height=move || format!("{}px", view.get().height)
+                style:width=move || format!("{}px", view.get().width)
             >
                 <g transform=move || {
                     format!("translate({},{})", -translate_svg.get()[0], -translate_svg.get()[1])
