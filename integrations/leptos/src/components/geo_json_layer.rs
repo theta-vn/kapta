@@ -1,7 +1,7 @@
 use geojson::FeatureCollection;
 use kapta::{
     consts::{BOUND_LAT_3857, BOUND_LON_3857},
-    coords::{geojson_to_kaptageo, KaptaGeo, KaptaPoint, KaptaPolygon},
+    coords::{geojson_to_kaptageo, KaptaGeo, KaptaPoint, KaptaPolygon, KaptaLineString},
     views::KaptaView,
 };
 use leptos::*;
@@ -95,6 +95,9 @@ pub fn GeoJsonLayer(
                             KaptaGeo::Polygon(polygon) => {
                                 render_polygon(polygon, zoom, translate).into_view()
                             }
+                            KaptaGeo::LineString(line_string) => {
+                                render_line_string(line_string, zoom, translate).into_view()
+                            }
                         }}
 
                     </For>
@@ -136,6 +139,28 @@ pub fn render_polygon(
         d.push_str(&v);
     }
     d.push_str("Z");
+    view! {
+        <g>
+            <path d=d stroke="red" fill="none"></path>
+        </g>
+    }
+}
+
+
+pub fn render_line_string(
+    line_string: KaptaLineString,
+    zoom: ReadSignal<u8>,
+    translate: ReadSignal<KaptaPoint>,
+) -> impl IntoView {
+    let hull = &line_string.value;
+    let mut d = "M".to_string();
+    for p in hull {
+        let point = point_sub(point_to_pixel(*p, zoom.get()), translate.get().value);
+
+        let v = format!(" {},{} ", point[0], point[1]);
+        d.push_str(&v);
+    }
+    // d.push_str("Z");
     view! {
         <g>
             <path d=d stroke="red" fill="none"></path>

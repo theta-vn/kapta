@@ -3,5 +3,5 @@ mod kapta_geo;
 mod proj_coord;
 pub use geo_types::Coord;
 pub use kapta_coord::{KaptaCoord, CRS};
-pub use kapta_geo::{geojson_to_kaptageo, KaptaGeo, KaptaPoint, KaptaPolygon, SeriesKG};
+pub use kapta_geo::{geojson_to_kaptageo, KaptaGeo, KaptaPoint, KaptaPolygon, SeriesKG, KaptaLineString};
 pub use proj_coord::{Proj, ProjCoord};

@@ -15,6 +15,17 @@ pub fn App() -> impl IntoView {
         "type": "FeatureCollection",
         "features": [
             {
+              "type": "Feature",
+              "properties": {
+                  "population": 200,
+                  "show": "marker"
+              },
+              "geometry": {
+                "type": "LineString",
+                "coordinates": [[100, 10], [105, 15], [110, 25]]
+              }
+            },
+            {
                 "type": "Feature",
                 "properties": {
                     "population": 200,

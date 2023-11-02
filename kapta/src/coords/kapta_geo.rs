@@ -7,7 +7,7 @@ use geojson::{FeatureCollection, JsonObject};
 pub enum KaptaGeo {
     Point(KaptaPoint),
     // MultiPoint(Vec<PointType>),
-    // LineString(LineStringType),
+    LineString(KaptaLineString),
     // MultiLineString(Vec<LineStringType>),
     Polygon(KaptaPolygon),
     // MultiPolygon(Vec<PolygonType>),
@@ -46,6 +46,7 @@ impl From<[f64; 2]> for KaptaPoint {
 }
 
 impl Eq for KaptaPoint {}
+
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct KaptaPolygon {
     pub value: Vec<Vec<[f64; 2]>>,
@@ -67,6 +68,26 @@ impl KaptaPolygon {
     }
 }
 
+#[derive(Debug, Default, Clone, PartialEq)]
+pub struct KaptaLineString {
+    pub value: Vec<[f64; 2]>,
+    pub properties: Option<JsonObject>,
+}
+impl Hash for KaptaLineString {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        for m in self.value.clone() {
+            format!("{:.6}", m[0]).hash(state);
+            format!("{:.6}", m[1]).hash(state);
+        }
+    }
+}
+
+impl KaptaLineString {
+    pub fn new(value: Vec<[f64; 2]>, properties: Option<JsonObject>) -> Self {
+        Self { value, properties }
+    }
+}
+
 pub fn geojson_to_kaptageo(geo_feature: FeatureCollection) -> Vec<KaptaGeo> {
     let mut array: Vec<KaptaGeo> = [].to_vec();
     for (_pos, geo_jf) in geo_feature.features.iter().enumerate() {
@@ -84,7 +105,14 @@ pub fn geojson_to_kaptageo(geo_feature: FeatureCollection) -> Vec<KaptaGeo> {
                 array.push(KaptaGeo::Point(kapta_point));
             }
             geojson::Value::MultiPoint(_) => todo!(),
-            geojson::Value::LineString(_) => todo!(),
+            geojson::Value::LineString(line_string) => {
+                let mut value: Vec<[f64; 2]> = [].to_vec();
+                for point in line_string {
+                    let coord = KaptaCoord::new(point[0], point[1]).to_proj_coord();
+                    value.push([coord.x, coord.y]);
+                }
+                array.push(KaptaGeo::LineString(KaptaLineString::new(value, geo_prop)))
+            }
             geojson::Value::MultiLineString(_) => todo!(),
             geojson::Value::Polygon(polygon) => {
                 // dbg!(polygon)
