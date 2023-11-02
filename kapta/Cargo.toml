@@ -13,4 +13,4 @@ geo = "0.26.0"
 geo-types = {version="0.7.11", features = ["serde"]}
 approx = "0.5"
 geojson = "0.24.1"
-# log = "0.4.6"
+log = "0.4.6"
