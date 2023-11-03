@@ -114,17 +114,16 @@ pub fn Kapta(
 
                 <div
 
-                    style="position: absolute; z-index: 90;"
+                    // style="position: absolute; z-index: 90;"
                     style:height=move || format!("{}px", height)
                     style:width=move || format!("{}px", width)
-                    style:transform=move || {
-                        format!(
-                            "translate3d({}px, {}px, 0px)",
-                            position.get().x + topleft.get().x,
-                            position.get().y + topleft.get().y,
-                        )
-                    }
-                >
+                >// style:transform=move || {
+                // format!(
+                // "translate3d({}px, {}px, 0px)",
+                // position.get().x + topleft.get().x,
+                // position.get().y + topleft.get().y,
+                // )
+                // }
                 </div>
             </div>
             <GeoJsonLayer

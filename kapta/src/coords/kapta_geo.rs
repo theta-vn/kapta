@@ -96,7 +96,7 @@ pub fn geojson_to_kaptageo(geo_feature: FeatureCollection) -> Vec<KaptaGeo> {
         let geo_prop = geo.properties;
 
         match geo_value {
-            geojson::Value::Point(point) => {                
+            geojson::Value::Point(point) => {
                 let coord = KaptaCoord::new(point[0], point[1]);
                 let proj_coord = coord.to_proj_coord();
                 let kapta_point = KaptaPoint::new([proj_coord.x, proj_coord.y], geo_prop);
@@ -107,7 +107,8 @@ pub fn geojson_to_kaptageo(geo_feature: FeatureCollection) -> Vec<KaptaGeo> {
                 for point in multi_point {
                     let coord = KaptaCoord::new(point[0], point[1]);
                     let proj_coord = coord.to_proj_coord();
-                    let kapta_point = KaptaPoint::new([proj_coord.x, proj_coord.y], geo_prop.clone());
+                    let kapta_point =
+                        KaptaPoint::new([proj_coord.x, proj_coord.y], geo_prop.clone());
                     multi_value.push(kapta_point);
                 }
                 array.push(KaptaGeo::MultiPoint(multi_value));

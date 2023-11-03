@@ -128,7 +128,7 @@ pub fn GeoJsonLayer(
                             KaptaGeo::Point(point) => {
                                 render_point(point, zoom, translate).into_view()
                             }
-                            KaptaGeo::MultiPoint(multi_point) => {                                
+                            KaptaGeo::MultiPoint(multi_point) => {
                                 (multi_point
                                     .into_iter()
                                     .map(|n| render_point(n, zoom, translate).into_view())
@@ -169,16 +169,49 @@ pub fn render_point(
     zoom: ReadSignal<u8>,
     translate: ReadSignal<KaptaPoint>,
 ) -> impl IntoView {
+    // log::debug!("{:#?}",point.properties);
+    let draw = match point.properties {
+        Some(prop) => {
+            match prop.get("kapta") {
+                Some(value) => {
+                    // log::debug!("Value:: {:#?}", value);
+                    if value.is_object() {
+                        log::debug!("{:#}", value["draw"]);
+                        if value["draw"] == "marker" {
+                            "marker"
+                        } else {
+                            "circle"
+                        }
+                    } else {
+                        "circle"
+                    }
+                }
+                None => "circle",
+            }
+        }
+        None => "circle",
+    };
+    log::debug!("{:#?}", draw);
     let point = point_sub(
         point_to_pixel(point.value, zoom.get_untracked()),
         translate.get_untracked().value,
     );
-
-    let d = format!("M{},{}l-10,-25a10,10 1 0 1 20,0z m-5,-25 a5,5 1 0 1 10,0 a5,5 1 0 1 -10,0 z", point[0], point[1]);
-    view! {
-        <g>
-            <path d=d stroke="none" fill="red" fill-rule="evenodd"></path>
-        </g>
+    if draw == "marker" {
+        let d = format!(
+            "M{},{}l-10,-25a10,10 1 0 1 20,0z m-5,-25 a5,5 1 0 1 10,0 a5,5 1 0 1 -10,0 z",
+            point[0], point[1]
+        );
+        view! {
+            <g>
+                <path d=d stroke="none" fill="red" fill-rule="evenodd"></path>
+            </g>
+        }
+    } else {
+        view! {
+            <g>
+                <circle cx=point[0] cy=point[1] r="5" stroke="none" fill="red"></circle>
+            </g>
+        }
     }
 }
 
