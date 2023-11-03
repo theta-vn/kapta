@@ -128,6 +128,13 @@ pub fn GeoJsonLayer(
                             KaptaGeo::Point(point) => {
                                 render_point(point, zoom, translate).into_view()
                             }
+                            KaptaGeo::MultiPoint(multi_point) => {                                
+                                (multi_point
+                                    .into_iter()
+                                    .map(|n| render_point(n, zoom, translate).into_view())
+                                    .collect::<Vec<_>>())
+                                    .into_view()
+                            }
                             KaptaGeo::Polygon(polygon) => {
                                 render_polygon(polygon, zoom, translate).into_view()
                             }
@@ -167,10 +174,10 @@ pub fn render_point(
         translate.get_untracked().value,
     );
 
-    let d = format!("M{},{} l-9,-25 l5,-5 h8 l5,5Z", point[0], point[1]);
+    let d = format!("M{},{}l-10,-25a10,10 1 0 1 20,0z m-5,-25 a5,5 1 0 1 10,0 a5,5 1 0 1 -10,0 z", point[0], point[1]);
     view! {
         <g>
-            <path d=d stroke="red" fill="none"></path>
+            <path d=d stroke="none" fill="red" fill-rule="evenodd"></path>
         </g>
     }
 }

@@ -59,6 +59,17 @@ pub fn App() -> impl IntoView {
             "type": "Point",
             "coordinates": [106.645, 10.788]
           }
+        },
+        {
+          "type": "Feature",
+          "properties": {
+            "population": 200,
+            "show": "marker"
+          },
+          "geometry": {
+            "type": "MultiPoint",
+            "coordinates": [[106.645, 19.788], [106.645, 17.788]]
+          }
         }
       ]
     }

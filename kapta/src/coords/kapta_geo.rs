@@ -6,7 +6,7 @@ use geojson::{FeatureCollection, JsonObject};
 #[derive(Clone, Debug, PartialEq, Hash)]
 pub enum KaptaGeo {
     Point(KaptaPoint),
-    // MultiPoint(Vec<PointType>),
+    MultiPoint(Vec<KaptaPoint>),
     LineString(KaptaLineString),
     MultiLineString(Vec<KaptaLineString>),
     Polygon(KaptaPolygon),
@@ -96,15 +96,22 @@ pub fn geojson_to_kaptageo(geo_feature: FeatureCollection) -> Vec<KaptaGeo> {
         let geo_prop = geo.properties;
 
         match geo_value {
-            geojson::Value::Point(point) => {
+            geojson::Value::Point(point) => {                
                 let coord = KaptaCoord::new(point[0], point[1]);
-
                 let proj_coord = coord.to_proj_coord();
-
                 let kapta_point = KaptaPoint::new([proj_coord.x, proj_coord.y], geo_prop);
                 array.push(KaptaGeo::Point(kapta_point));
             }
-            geojson::Value::MultiPoint(_) => {}
+            geojson::Value::MultiPoint(multi_point) => {
+                let mut multi_value: Vec<KaptaPoint> = [].to_vec();
+                for point in multi_point {
+                    let coord = KaptaCoord::new(point[0], point[1]);
+                    let proj_coord = coord.to_proj_coord();
+                    let kapta_point = KaptaPoint::new([proj_coord.x, proj_coord.y], geo_prop.clone());
+                    multi_value.push(kapta_point);
+                }
+                array.push(KaptaGeo::MultiPoint(multi_value));
+            }
             geojson::Value::LineString(line_string) => {
                 let mut value: Vec<[f64; 2]> = [].to_vec();
                 for point in line_string {
