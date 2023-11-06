@@ -216,7 +216,8 @@ pub fn App() -> impl IntoView {
             "address": "397 Ba Muoi Thang Tu",
             "name": "SNA",
             "kapta": {
-              "draw": "marker"
+              "draw": "marker",
+              "color": "blue"
             }
           },
           "geometry": {
@@ -230,7 +231,8 @@ pub fn App() -> impl IntoView {
             "address": "No 20 Street",
             "name": "SNA",
             "kapta": {
-              "draw": "marker"
+              "draw": "marker",
+              "color": "blue"
             }
           },
           "geometry": {
@@ -246,7 +248,8 @@ pub fn App() -> impl IntoView {
             "address": "Ha Long",
             "name": "UKA",
             "kapta": {
-              "draw": "marker"
+              "draw": "marker",
+              "color": "blue"
             }
           },
           "geometry": {
@@ -260,7 +263,8 @@ pub fn App() -> impl IntoView {
             "address": "Hue",
             "name": "UKA",
             "kapta": {
-              "draw": "marker"
+              "draw": "marker",
+              "color": "blue"
             }
           },
           "geometry": {
@@ -274,7 +278,8 @@ pub fn App() -> impl IntoView {
             "address": "Da Nang",
             "name": "UKA",
             "kapta": {
-              "draw": "marker"
+              "draw": "marker",
+              "color": "blue"
             }
           },
           "geometry": {
@@ -288,7 +293,8 @@ pub fn App() -> impl IntoView {
             "address": "Quang Ngai",
             "name": "UKA",
             "kapta": {
-              "draw": "marker"
+              "draw": "marker",
+              "color": "blue"
             }
           },
           "geometry": {
@@ -302,7 +308,8 @@ pub fn App() -> impl IntoView {
             "address": "Binh Thanh",
             "name": "UKA",
             "kapta": {
-              "draw": "marker"
+              "draw": "marker",
+              "color": "blue"
             }
           },
           "geometry": {
@@ -316,7 +323,8 @@ pub fn App() -> impl IntoView {
             "address": "Ba Ria",
             "name": "UKA",
             "kapta": {
-              "draw": "marker"
+              "draw": "marker",
+              "color": "blue"
             }
           },
           "geometry": {
@@ -330,7 +338,8 @@ pub fn App() -> impl IntoView {
             "address": "Gia Lai",
             "name": "UKA",
             "kapta": {
-              "draw": "marker"
+              "draw": "marker",
+              "color": "blue"
             }
           },
           "geometry": {
@@ -343,7 +352,8 @@ pub fn App() -> impl IntoView {
           "properties": {
             "name": "iSchool",
             "kapta": {
-              "draw": "marker"
+              "draw": "marker",
+              "color": "blue"
             }
           },
           "geometry": {
@@ -370,7 +380,8 @@ pub fn App() -> impl IntoView {
           "properties": {
             "name": "SGA",
             "kapta": {
-              "draw": "marker"
+              "draw": "marker",
+              "color": "green"
             }
           },
           "geometry": {
@@ -389,7 +400,7 @@ pub fn App() -> impl IntoView {
     let geo_feature = match FeatureCollection::from_str(geojson_str) {
         Ok(feature) => feature,
         Err(e) => {
-            log::debug!("{:#?}", e);
+            
             FeatureCollection {
                 bbox: None,
                 features: vec![],
@@ -398,7 +409,7 @@ pub fn App() -> impl IntoView {
         }
     };
 
-    let center: KaptaCoord = KaptaCoord::new(106.6931669, 10.7849477);
+    let center: KaptaCoord = KaptaCoord::new(106.6931669, 16.5);
     let win = leptos::window();
     let wwidth = win.inner_width().unwrap().as_f64().unwrap();
     let wheight = win.inner_height().unwrap().as_f64().unwrap();
@@ -406,7 +417,7 @@ pub fn App() -> impl IntoView {
     view! {
         <div class="flex justify-center">
             <Kapta
-                zoom=12
+                zoom=6
                 width=wwidth as u32
                 height=wheight as u32
                 center=center

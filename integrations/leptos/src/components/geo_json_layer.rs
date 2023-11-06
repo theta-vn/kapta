@@ -168,24 +168,59 @@ pub fn render_point(
     point: KaptaPoint,
     zoom: ReadSignal<u8>,
     translate: ReadSignal<KaptaPoint>,
-) -> impl IntoView {    
-    let draw = match point.properties {
-        Some(prop) => match prop.get("kapta") {
-            Some(value) => {
-                if value.is_object() {
-                    if value["draw"] == "marker" {
-                        "marker"
-                    } else {
-                        "circle"
-                    }
-                } else {
-                    "circle"
-                }
+) -> impl IntoView { 
+    let kapta_prop = match point.clone().properties {
+        Some(prop) =>  {
+            match prop.get("kapta") {
+                Some(value) => value.clone(),
+                None => serde_json::value::Value::Null,
             }
-            None => "circle",
         },
-        None => "circle",
+        None => serde_json::value::Value::Null,
     };
+    let mut draw = "circle";
+    let mut color = "red".to_string();
+    if kapta_prop.clone().is_object() && kapta_prop["draw"] == "marker" { draw = "marker"};
+    if kapta_prop.clone().is_object() && kapta_prop["color"].is_string() {
+        color = kapta_prop["color"].as_str().unwrap().to_string();
+        // color = color_string.clone().as_str();
+    }
+
+    // let draw = if  {
+    //     Some(prop) => match prop.get("kapta") {
+    //         Some(value) => {
+    //             if value.is_object() {
+    //                 if value["draw"] == "marker" {
+    //                     "marker"
+    //                 } else {
+    //                     "circle"
+    //                 }
+    //             } else {
+    //                 "circle"
+    //             }
+    //         }
+    //         None => "circle",
+    //     },
+    //     None => "circle",
+    // };
+    // let color = match point.properties {
+    //     Some(prop) => match prop.get("kapta") {
+    //         Some(value) => {
+    //             if value.is_object() {                   
+    //                 if value["color"].is_string() {
+    //                     value["color"].as_str().unwrap()
+    //                 } else {
+    //                     "red"
+    //                 }
+
+    //             } else {
+    //                 "red"
+    //             }
+    //         }
+    //         None => "red",
+    //     },
+    //     None => "red",
+    // };
     let point = point_sub(
         point_to_pixel(point.value, zoom.get_untracked()),
         translate.get_untracked().value,
@@ -197,13 +232,13 @@ pub fn render_point(
         );
         view! {
             <g>
-                <path d=d stroke="none" fill="red" fill-rule="evenodd"></path>
+                <path d=d stroke="none" fill=color fill-rule="evenodd"></path>
             </g>
         }
     } else {
         view! {
             <g>
-                <circle cx=point[0] cy=point[1] r="5" stroke="none" fill="red"></circle>
+                <circle cx=point[0] cy=point[1] r="5" stroke="none" fill=color ></circle>
             </g>
         }
     }
