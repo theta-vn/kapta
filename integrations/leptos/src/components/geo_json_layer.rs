@@ -168,30 +168,24 @@ pub fn render_point(
     point: KaptaPoint,
     zoom: ReadSignal<u8>,
     translate: ReadSignal<KaptaPoint>,
-) -> impl IntoView {
-    // log::debug!("{:#?}",point.properties);
+) -> impl IntoView {    
     let draw = match point.properties {
-        Some(prop) => {
-            match prop.get("kapta") {
-                Some(value) => {
-                    // log::debug!("Value:: {:#?}", value);
-                    if value.is_object() {
-                        log::debug!("{:#}", value["draw"]);
-                        if value["draw"] == "marker" {
-                            "marker"
-                        } else {
-                            "circle"
-                        }
+        Some(prop) => match prop.get("kapta") {
+            Some(value) => {
+                if value.is_object() {
+                    if value["draw"] == "marker" {
+                        "marker"
                     } else {
                         "circle"
                     }
+                } else {
+                    "circle"
                 }
-                None => "circle",
             }
-        }
+            None => "circle",
+        },
         None => "circle",
     };
-    log::debug!("{:#?}", draw);
     let point = point_sub(
         point_to_pixel(point.value, zoom.get_untracked()),
         translate.get_untracked().value,
