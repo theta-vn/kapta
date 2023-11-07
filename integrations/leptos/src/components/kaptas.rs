@@ -1,9 +1,11 @@
+use crate::components::TooltipLayer;
+
 use super::{Control, GeoJsonLayer, TileLayer};
 use geojson::FeatureCollection;
 pub use kapta::coords::KaptaCoord;
 use kapta::{
     coords::{Coord, ProjCoord},
-    views::{KaptaView, SeriesPC},
+    views::{KaptaView, SeriesPC, Tooltip},
 };
 use leptos::{html::Div, *};
 use leptos_use::{
@@ -25,6 +27,7 @@ pub fn Kapta(
     let (view, set_view) = create_signal(KaptaView::default());
     let (collection, set_collection) = create_signal(SeriesPC::default());
     let (new_center, set_new_center) = create_signal(ProjCoord::default());
+    let (tooltip, set_tooltip) = create_signal(Tooltip::default());
 
     let div_ref = create_node_ref::<Div>();
 
@@ -55,6 +58,7 @@ pub fn Kapta(
         {
             // First || zoom || end drap ELSE drapping
             if !is_dragging.get() && !loading.get() {
+                set_tooltip.set(Tooltip::default());
                 let kview = KaptaView::new(
                     new_center.get(),
                     topleft.get(),
@@ -82,6 +86,7 @@ pub fn Kapta(
                 let kcollection = view.get().new_collection();
                 set_collection.set(kcollection);
             } else {
+                set_tooltip.set(Tooltip::default());
                 let (check, top_left, center, bottom_right, proj_3857_new) = view
                     .get()
                     .drap_change_bound(position.get().x, position.get().y);
@@ -103,30 +108,21 @@ pub fn Kapta(
         >
             <Control zoom=zoom set_zoom=set_zoom/>
             <div
-                node_ref=div_ref                
+                node_ref=div_ref
                 style="position: absolute; z-index: 90;"
                 style:transform=move || {
                     format!("translate3d({}px, {}px, 0px)", -topleft.get().x, -topleft.get().y)
                 }
             >
-                <div
-                    id="kapta-popup"
-                    style:height=move || format!("{}px", height)
-                    style:width=move || format!("{}px", width)
-                >
-                    <span
-                        style="border: 1px solid #000; padding: 10px; border-radius: 10px; position: relative; top: 50px; left: 200px; background: #ff0000; z-index: 100"
-                    >
-                        Vai dong chu
-                    </span>
-                    
-                </div>
+
+                <TooltipLayer tooltip=tooltip/>
                 <GeoJsonLayer
                     feature_collection=feature_collection
                     zoom=zoom
                     view=view
                     position=position
                     is_dragging=is_dragging
+                    set_tooltip=set_tooltip
                 />
             </div>
 
@@ -141,6 +137,7 @@ pub fn Kapta(
                     )
                 }
             >
+
                 <TileLayer view=view collection=collection/>
             </div>
             <div id="kapta-copy-right">
