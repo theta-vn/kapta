@@ -399,8 +399,7 @@ pub fn App() -> impl IntoView {
 
     let geo_feature = match FeatureCollection::from_str(geojson_str) {
         Ok(feature) => feature,
-        Err(e) => {
-            
+        Err(_e) => {            
             FeatureCollection {
                 bbox: None,
                 features: vec![],

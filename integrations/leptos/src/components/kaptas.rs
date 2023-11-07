@@ -77,7 +77,6 @@ pub fn Kapta(
                     );
                     set_view.set(kview);
                     set_position.set(Position::default());
-                    // log::debug!("{:#?}", view.get());
                 }
 
                 let kcollection = view.get().new_collection();
@@ -111,19 +110,10 @@ pub fn Kapta(
                     format!("translate3d({}px, {}px, 0px)", -topleft.get().x, -topleft.get().y)
                 }
             >
-
                 <div
-
-                    // style="position: absolute; z-index: 90;"
                     style:height=move || format!("{}px", height)
                     style:width=move || format!("{}px", width)
-                >// style:transform=move || {
-                // format!(
-                // "translate3d({}px, {}px, 0px)",
-                // position.get().x + topleft.get().x,
-                // position.get().y + topleft.get().y,
-                // )
-                // }
+                >
                 </div>
             </div>
             <GeoJsonLayer
