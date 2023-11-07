@@ -2,7 +2,7 @@ use geojson::FeatureCollection;
 use kapta::{
     consts::{BOUND_LAT_3857, BOUND_LON_3857},
     coords::{geojson_to_kaptageo, KaptaGeo, KaptaLineString, KaptaPoint, KaptaPolygon},
-    views::KaptaView,
+    views::{KaptaView, Tooltip},
 };
 use leptos::{svg::G, *};
 use leptos_use::core::Position;
@@ -13,7 +13,7 @@ pub fn GeoJsonLayer(
     zoom: ReadSignal<u8>,
     position: Signal<Position>,
     is_dragging: Signal<bool>,
-
+    set_tooltip: WriteSignal<Tooltip>,
     #[prop(default = None)] feature_collection: Option<FeatureCollection>,
 ) -> impl IntoView {
     let (loading, set_loading) = create_signal(true);
@@ -126,7 +126,34 @@ pub fn GeoJsonLayer(
 
                         {match data {
                             KaptaGeo::Point(point) => {
-                                render_point(point, zoom, translate).into_view()
+                                view! {
+                                    // render_point(point, zoom, translate, set_tooltip).into_view()
+                                    <RenderPoint
+                                        point=point
+                                        zoom=zoom
+                                        translate=translate
+                                        set_tooltip=set_tooltip
+                                    />
+                                }
+                            }
+                            KaptaGeo::MultiPoint(multi_point) => {
+                                (multi_point
+                                    .into_iter()
+                                    .map(|n| {
+                                        view! {
+                                            // render_point(point, zoom, translate, set_tooltip).into_view()
+
+                                            // .map(|n| render_point(n, zoom, translate, set_tooltip).into_view())
+                                            <RenderPoint
+                                                point=n
+                                                zoom=zoom
+                                                translate=translate
+                                                set_tooltip=set_tooltip
+                                            />
+                                        }
+                                    })
+                                    .collect::<Vec<_>>())
+                                    .into_view()
                             }
                             KaptaGeo::Polygon(polygon) => {
                                 render_polygon(polygon, zoom, translate).into_view()
@@ -157,21 +184,57 @@ pub fn GeoJsonLayer(
     }
 }
 
-pub fn render_point(
+#[component]
+pub fn RenderPoint(
     point: KaptaPoint,
     zoom: ReadSignal<u8>,
     translate: ReadSignal<KaptaPoint>,
+    set_tooltip: WriteSignal<Tooltip>,
 ) -> impl IntoView {
-    let point = point_sub(
+    let properties = point.properties;
+    let kapta_prop = match properties.clone() {
+        Some(prop) => match prop.get("kapta") {
+            Some(value) => value.clone(),
+            None => serde_json::value::Value::Null,
+        },
+        None => serde_json::value::Value::Null,
+    };
+
+    let mut draw = "circle";
+    let mut color = "red".to_string();
+    if kapta_prop.clone().is_object() && kapta_prop["draw"] == "marker" {
+        draw = "marker"
+    };
+    if kapta_prop.clone().is_object() && kapta_prop["color"].is_string() {
+        color = kapta_prop["color"].as_str().unwrap().to_string();
+    }
+
+    let coord = point_sub(
         point_to_pixel(point.value, zoom.get_untracked()),
         translate.get_untracked().value,
     );
-
-    let d = format!("M{},{} l-9,-25 l5,-5 h8 l5,5Z", point[0], point[1]);
-    view! {
-        <g>
-            <path d=d stroke="red" fill="none"></path>
-        </g>
+    if draw == "marker" {
+        let d = format!(
+            "M{},{}l-12,-25a12,12 1 0 1 24,0z m-4,-25 a4,4 1 0 1 8,0 a4,4 1 0 1 -8,0 z",
+            coord[0], coord[1]
+        );
+        view! {
+            <g on:click=move |_| {
+                let tool = Tooltip {
+                    coor: (coord[0], coord[1]).into(),
+                    html: properties.clone().unwrap()["name"].as_str().unwrap().to_string(),
+                };
+                set_tooltip.set(tool.clone());
+            }>
+                <path d=d stroke="none" fill=color fill-rule="evenodd"></path>
+            </g>
+        }
+    } else {
+        view! {
+            <g>
+                <circle cx=coord[0] cy=coord[1] r="5" stroke="none" fill=color></circle>
+            </g>
+        }
     }
 }
 

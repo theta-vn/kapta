@@ -9,3 +9,6 @@ pub use self::kaptas::Kapta;
 
 mod geo_json_layer;
 pub use self::geo_json_layer::GeoJsonLayer;
+
+mod tooltip_layer;
+pub use self::tooltip_layer::TooltipLayer;

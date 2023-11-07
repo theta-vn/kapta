@@ -229,3 +229,40 @@ fn render() {
         // 14667932546091814007
     }
 }
+
+#[test]
+fn convert() {
+    let geojson_str = r#"
+  {
+      "type": "FeatureCollection",
+      "features": [
+          {
+              "type": "Feature",
+              "properties": {
+                "address": "49 Pham Ngoc Thach",
+                "kapta": {
+                  "show": "marker"
+                }
+              },
+              "geometry": {
+                  "type": "Point",
+                  "coordinates": [106.690438, 10.7849054]
+              }
+          }
+      ]
+  }
+  "#;
+
+    let geo_feature = FeatureCollection::from_str(geojson_str).unwrap();
+    dbg!(&geo_feature);
+
+    let array = geojson_to_kaptageo(geo_feature);
+    dbg!(&array);
+    for m in array {
+        let mut hasher = DefaultHasher::new();
+        m.hash(&mut hasher);
+        dbg!(hasher.finish());
+        // 1540136902312859152
+        // 14667932546091814007
+    }
+}
