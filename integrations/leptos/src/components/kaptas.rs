@@ -103,28 +103,34 @@ pub fn Kapta(
         >
             <Control zoom=zoom set_zoom=set_zoom/>
             <div
-                node_ref=div_ref
-                id="kapta-proxy"
+                node_ref=div_ref                
                 style="position: absolute; z-index: 90;"
                 style:transform=move || {
                     format!("translate3d({}px, {}px, 0px)", -topleft.get().x, -topleft.get().y)
                 }
             >
                 <div
+                    id="kapta-popup"
                     style:height=move || format!("{}px", height)
                     style:width=move || format!("{}px", width)
                 >
+                    <span
+                        style="border: 1px solid #000; padding: 10px; border-radius: 10px; position: relative; top: 50px; left: 200px; background: #ff0000; z-index: 100"
+                    >
+                        Vai dong chu
+                    </span>
+                    
                 </div>
+                <GeoJsonLayer
+                    feature_collection=feature_collection
+                    zoom=zoom
+                    view=view
+                    position=position
+                    is_dragging=is_dragging
+                />
             </div>
-            <GeoJsonLayer
-                feature_collection=feature_collection
-                zoom=zoom
-                view=view
-                position=position
-                is_dragging=is_dragging
-            />
-            <div
 
+            <div
                 id="kapta-base"
                 style="position: relative; z-index: 0;"
                 style:transform=move || {
@@ -135,7 +141,6 @@ pub fn Kapta(
                     )
                 }
             >
-
                 <TileLayer view=view collection=collection/>
             </div>
             <div id="kapta-copy-right">

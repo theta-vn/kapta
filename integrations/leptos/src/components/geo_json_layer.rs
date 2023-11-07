@@ -169,7 +169,8 @@ pub fn render_point(
     zoom: ReadSignal<u8>,
     translate: ReadSignal<KaptaPoint>,
 ) -> impl IntoView { 
-    let kapta_prop = match point.clone().properties {
+    let properties  = point.properties;
+    let kapta_prop = match properties.clone() {
         Some(prop) =>  {
             match prop.get("kapta") {
                 Some(value) => value.clone(),
@@ -178,67 +179,34 @@ pub fn render_point(
         },
         None => serde_json::value::Value::Null,
     };
+
     let mut draw = "circle";
     let mut color = "red".to_string();
     if kapta_prop.clone().is_object() && kapta_prop["draw"] == "marker" { draw = "marker"};
     if kapta_prop.clone().is_object() && kapta_prop["color"].is_string() {
         color = kapta_prop["color"].as_str().unwrap().to_string();
-        // color = color_string.clone().as_str();
+        
     }
 
-    // let draw = if  {
-    //     Some(prop) => match prop.get("kapta") {
-    //         Some(value) => {
-    //             if value.is_object() {
-    //                 if value["draw"] == "marker" {
-    //                     "marker"
-    //                 } else {
-    //                     "circle"
-    //                 }
-    //             } else {
-    //                 "circle"
-    //             }
-    //         }
-    //         None => "circle",
-    //     },
-    //     None => "circle",
-    // };
-    // let color = match point.properties {
-    //     Some(prop) => match prop.get("kapta") {
-    //         Some(value) => {
-    //             if value.is_object() {                   
-    //                 if value["color"].is_string() {
-    //                     value["color"].as_str().unwrap()
-    //                 } else {
-    //                     "red"
-    //                 }
-
-    //             } else {
-    //                 "red"
-    //             }
-    //         }
-    //         None => "red",
-    //     },
-    //     None => "red",
-    // };
-    let point = point_sub(
+    let coord = point_sub(
         point_to_pixel(point.value, zoom.get_untracked()),
         translate.get_untracked().value,
     );
     if draw == "marker" {
         let d = format!(
-            "M{},{}l-10,-25a10,10 1 0 1 20,0z m-5,-25 a5,5 1 0 1 10,0 a5,5 1 0 1 -10,0 z",
-            point[0], point[1]
+            "M{},{}l-12,-25a12,12 1 0 1 24,0z m-4,-25 a4,4 1 0 1 8,0 a4,4 1 0 1 -8,0 z",
+            coord[0], coord[1]
         );
         view! {
+            // <g on:click=move |_| log::debug!("CLICK::{:#?}", properties.clone().unwrap()["name"].as_str().unwrap())>
             <g>
-                <path d=d stroke="none" fill=color fill-rule="evenodd"></path>
+                <path d=d stroke="none" fill=color fill-rule="evenodd" />
             </g>
         }
     } else {
         view! {
             <g>
-                <circle cx=point[0] cy=point[1] r="5" stroke="none" fill=color ></circle>
+                <circle cx=coord[0] cy=coord[1] r="5" stroke="none" fill=color ></circle>
             </g>
         }
     }
