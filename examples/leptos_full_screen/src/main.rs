@@ -356,7 +356,8 @@ pub fn App() -> impl IntoView {
             "name": "iSchool",
             "kapta": {
               "draw": "marker",
-              "color": "blue"
+              "color": "blue",
+              "tooltip": "iSchool"
             }
           },
           "geometry": {
@@ -384,7 +385,8 @@ pub fn App() -> impl IntoView {
             "name": "SGA",
             "kapta": {
               "draw": "marker",
-              "color": "green"
+              "color": "green",
+              "tooltip": "Saigon Academy"
             }
           },
           "geometry": {
