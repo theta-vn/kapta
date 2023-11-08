@@ -140,10 +140,8 @@ pub fn GeoJsonLayer(
                                 (multi_point
                                     .into_iter()
                                     .map(|n| {
-                                        view! {
-                                            // render_point(point, zoom, translate, set_tooltip).into_view()
-
-                                            // .map(|n| render_point(n, zoom, translate, set_tooltip).into_view())
+                                        view! {                                          
+                                            
                                             <RenderPoint
                                                 point=n
                                                 zoom=zoom
@@ -222,7 +220,12 @@ pub fn RenderPoint(
             <g on:click=move |_| {
                 let tool = Tooltip {
                     coor: (coord[0], coord[1]).into(),
-                    html: properties.clone().unwrap()["name"].as_str().unwrap().to_string(),
+                    html: properties
+                        .clone()
+                        .unwrap()["kapta"]["tooltip"]
+                        .as_str()
+                        .unwrap()
+                        .to_string(),
                 };
                 set_tooltip.set(tool.clone());
             }>

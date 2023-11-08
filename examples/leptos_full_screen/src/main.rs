@@ -20,7 +20,8 @@ pub fn App() -> impl IntoView {
             "address": "49 Pham Ngoc Thach",
             "name": "NHG",
             "kapta": {
-              "draw": "marker"
+              "draw": "marker",
+              "tooltip": "NHG - 49 Pham Ngoc Thach"
             }
           },
           "geometry": {
@@ -34,7 +35,8 @@ pub fn App() -> impl IntoView {
             "address": "215 Dien Bien Phu",
             "name": "HIU",
             "kapta": {
-              "draw": "marker"
+              "draw": "marker",
+              "tooltip": "HIU - 215 Dien Bien Phu"
             }
           },
           "geometry": {
@@ -279,7 +281,8 @@ pub fn App() -> impl IntoView {
             "name": "UKA",
             "kapta": {
               "draw": "marker",
-              "color": "blue"
+              "color": "blue",
+              "tooltip": "UKA - Da nang"
             }
           },
           "geometry": {
@@ -294,7 +297,7 @@ pub fn App() -> impl IntoView {
             "name": "UKA",
             "kapta": {
               "draw": "marker",
-              "color": "blue"
+              "color": "blue"              
             }
           },
           "geometry": {
